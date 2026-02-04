@@ -29,7 +29,6 @@ public static class ServiceExtensions
         {
             Helpers.Actions.ActionDocumentRepo = pr.GetService<IMongoRepo<ActionRunDocument>>()!;
             Helpers.Actions.ActionCompletedRepo = pr.GetService<IMongoRepo<ActionCompletedDocument>>()!;
-            Helpers.Actions.ActionDataDocumentRepo = pr.GetService<IMongoRepo<ActionDataDocument>>()!;
         });
     }
 

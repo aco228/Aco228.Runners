@@ -8,4 +8,5 @@ namespace Aco228.Runners.Documents.Actions;
 public class ActionCompletedDocument : ActionDocumentBase
 {
     public string? ErrorMessage { get; set; }
+    public required object? Response { get; set; }
 }

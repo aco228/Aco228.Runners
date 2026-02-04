@@ -18,6 +18,7 @@ public static class ActionCompletedDocumentExtensions
             IsContextGroup = document.IsContextGroup,
             ContextGroupId = document.ContextGroupId,
             ErrorMessage = message,
+            Response = null,
         };
 
         await ServiceProviderHelper.GetService<IMongoRepo<ActionRunDocument>>()!.DeleteAsync(document);

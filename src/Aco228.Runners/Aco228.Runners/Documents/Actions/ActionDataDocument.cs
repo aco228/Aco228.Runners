@@ -9,10 +9,19 @@ namespace Aco228.Runners.Documents.Actions;
 [BsonIgnoreExtraElements]
 public class ActionDataDocument : MongoDocument
 {
-    [MongoIndex] public ObjectId ActionId { get; set; }
-    public required object Request { get; set; }
-    public required string RequestType { get; set; }
-    public required string ResponseType { get; set; }
-    
-    public object? Response { get; set; }
+    public required ObjectId ActionId { get; set; }
+
+    public List<ActionDataDocumentLog> Logs { get; set; } = new();
+}
+
+public class ActionDataDocumentLog
+{
+    public string Message { get; set; } = "";
+    public DateTime DateUtc { get; set; }
+
+    public ActionDataDocumentLog(string message)
+    {
+        Message = message;
+        DateUtc = DateTime.UtcNow;
+    }
 }

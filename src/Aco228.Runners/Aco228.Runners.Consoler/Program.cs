@@ -4,14 +4,17 @@ using Aco228.Common.Extensions;
 using Aco228.Runners;
 using Aco228.Runners.Consoler.Actions;
 using Aco228.Runners.Consoler.Db;
+using Aco228.Runners.Consoler.WebServices;
 using Aco228.Runners.Helpers;
 using Aco228.Runners.HostedServices;
+using Aco228.WService;
 using DotNetEnv;
 using Microsoft.Extensions.DependencyInjection;
 
 Env.Load();
 
 var builder = new ServiceCollection();
+builder.RegisterApiServices(typeof(Program).Assembly);
 builder.ConfigureRunActionServices<ILocalDbContext>();
 builder.RegisterServicesFromAssembly(typeof(Program).Assembly);
 builder.ConfigureRunActionBackgroundServices(new()
@@ -21,5 +24,10 @@ builder.ConfigureRunActionBackgroundServices(new()
 });
 var provider = await builder.BuildCollection();
 
-var actionDocument = await Actions.Get<DummyAction>().Schedule(1, Guid.NewGuid().ToString());
+
+await Actions.Get<DummyGithubAction>().Schedule(268896494, Guid.NewGuid().ToString());
+await Actions.Get<DummyGithubAction>().Schedule(268896682, Guid.NewGuid().ToString());
+await Actions.Get<DummyGithubAction>().Schedule(268896797, Guid.NewGuid().ToString());
+await Actions.Get<DummyGithubAction>().Schedule(268897264, Guid.NewGuid().ToString());
+
 await HostedServiceRunner.RunAsync(provider);

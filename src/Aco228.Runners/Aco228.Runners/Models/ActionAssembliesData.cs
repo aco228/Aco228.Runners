@@ -8,7 +8,10 @@ internal static class ActionAssembliesData
 
     public static bool TryGetType(string typeDefinition, out Type type)
     {
-        type = null;
+        type = Type.GetType(typeDefinition);
+        if(type != null)
+            return true;
+        
         foreach (var assembly in Assemblies)
         {
             var returnType = assembly.GetType(typeDefinition, throwOnError: false);

@@ -11,4 +11,5 @@ public class ActionDocumentBase : MongoDocument
     [MongoIndex] public ActionStatus Status { get; set; } = ActionStatus.Scheduled;
     [MongoIndex] public bool IsContextGroup { get; set; } = true;
     [MongoIndex] public string? ContextGroupId { get; set; } = null;
+    public int ErrorCount { get; set; } = 0;
 }
