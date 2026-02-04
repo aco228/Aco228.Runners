@@ -1,5 +1,5 @@
-﻿using Aco228.Runners.Actions.Documents;
-using Aco228.Runners.Actions.Exceptions;
+﻿using Aco228.Runners.Actions.Exceptions;
+using Aco228.Runners.Documents.Actions;
 using Aco228.Runners.Helpers;
 
 namespace Aco228.Runners.Actions;
@@ -45,7 +45,7 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
         return default;
     }
 
-    public Task<ActionDocument> Schedule(TRequest request, string? reference = null)
+    public Task<ActionRunDocument> Schedule(TRequest request, string? reference = null)
         => this.ScheduleInternal(request!, reference);
     
     protected abstract Task<TResponse> ExecuteInternal(TRequest request);

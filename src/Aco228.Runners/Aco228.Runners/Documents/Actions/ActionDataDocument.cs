@@ -3,7 +3,7 @@ using Aco228.MongoDb.Models.Attributes;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Aco228.Runners.Actions.Documents;
+namespace Aco228.Runners.Documents.Actions;
 
 [BsonCollection("ActionData")]
 [BsonIgnoreExtraElements]

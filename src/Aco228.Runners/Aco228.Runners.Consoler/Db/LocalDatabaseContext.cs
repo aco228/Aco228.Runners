@@ -1,6 +1,5 @@
 ﻿using Aco228.Common.Models;
 using Aco228.MongoDb.Services;
-using MongoDB.Driver;
 
 namespace Aco228.Runners.Consoler.Db;
 
