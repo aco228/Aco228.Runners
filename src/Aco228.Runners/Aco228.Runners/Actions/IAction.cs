@@ -9,5 +9,5 @@ public interface IAction
     internal Type RequestType { get; set; }
     internal Type ResponseType { get; set; }
 
-    internal Task ExecuteInBackground(IActionManager actionManager);
+    internal Task<object?> ExecuteInBackground(IActionManager actionManager);
 }

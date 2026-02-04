@@ -2,8 +2,10 @@
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Models;
 using Aco228.MongoDb.Services;
+using Aco228.Runners.Documents;
 using Aco228.Runners.Documents.Actions;
 using Aco228.Runners.Extensions;
+using Aco228.Runners.Helpers;
 using Aco228.Runners.HostedServices.ActionsHostService.Models;
 
 namespace Aco228.Runners.Actions.ActionManager;
@@ -29,32 +31,74 @@ internal class BackgroundServiceActionManager : IActionManager
         if (_actionDataDocument == null)
             _actionDataDocument = new() { ActionId = _actionDocument.Id, };
     }
+
+    public void Log(string message)
+    {
+        if(string.IsNullOrEmpty(message)) return;
+        _actionDataDocument.Logs.Add(new(message));
+        Console.WriteLine(message);
+    }
     
-    public void Log(string message) => _actionDataDocument.Logs.Add(new(message));
-    public object GetRequestObject() => _actionDocument.Request;
+    public ActionObjectModel? GetRequestObject() => _actionDocument.Request;
     
     public async Task OnExecutionStarted()
     {
+        Console.WriteLine("Executionstarted::");
         _actionDocument.ExecutionStartedTs = DT.GetUnix();
         await _actionRunDocumentRepo.InsertOrUpdateAsync(_actionDocument);
     }
 
     public ActionRunDocument GetActionDocument() => _actionDocument;
 
-    public async Task ChangeStatus(ActionStatus actionStatus)
+    public async Task ChangeStatus(ActionStatus actionStatus, string statusMessage = "")
     {
+        Console.WriteLine($"Status changed to ({actionStatus}) {statusMessage}");
+        Log(statusMessage);
         _actionDocument.Status = actionStatus;
         await _actionRunDocumentRepo.InsertOrUpdateAsync(_actionDocument);
     }
 
+    public async Task OnResultReceived(object result)
+    {
+        _actionDocument.ReleaseLock();
+        await _actionDocument.MoveToFinished(result);
+    }
+
     public async Task OnError(Exception ex)
     {
+        Console.WriteLine("Exception::" + ex.Message);
         _actionDocument.ErrorCount++;
         await _actionRunDocumentRepo.InsertOrUpdateAsync(_actionDocument);
     }
 
+    public async Task OnFatalError(string errorMessage)
+    {
+        _actionDocument.ReleaseLock();
+        _actionDocument.Status = ActionStatus.Failed;
+        Console.WriteLine("FatalException::" + errorMessage);
+        await _actionDocument.MoveToFailed(errorMessage);
+    }
+
+    public T? GetStoreObject<T>(string key)
+    {
+        if (_actionDataDocument.Data.TryGetValue(key, out var value))
+            return value.Get<T>();
+        return default;
+    }
+
+    public void SetStoreObject<T>(string key, T value)
+    {
+        _actionDataDocument.Data[key] = ActionObjectModelHelper.Get(value)!;
+    }
+
     public async Task OnExit()
     {
+        if (!_actionDocument.IsCompleted())
+        {
+            _actionDocument.ReleaseLock();
+            await _actionRunDocumentRepo.InsertOrUpdateAsync(_actionDocument);
+        }
+        
         await _actionDataRepo.InsertOrUpdateAsync(_actionDataDocument);
     }
 }

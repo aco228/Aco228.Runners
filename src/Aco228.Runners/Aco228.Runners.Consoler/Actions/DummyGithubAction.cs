@@ -7,29 +7,39 @@ namespace Aco228.Runners.Consoler.Actions;
 
 public class DummyActionResponse
 {
+    public int userId { get; set; }
     public int id { get; set; }
-    public string full_name { get; set; }
-    public string description { get; set; }
+    public string title { get; set; }
+    public string body { get; set; }
+    public bool completed { get; set; }
 }
 
 public class DummyGithubAction : ActionBase<int, DummyActionResponse>
 {
     protected override ushort MaximumNumberOfErrorRetries => 3;
     
-    [InjectService] public IGithubService GithubService { get; set; }
+    [InjectService] public IDummyApiService WebService { get; set; }
     
     protected override async Task<DummyActionResponse> ExecuteInternal(int request)
     {
-        var data = await GithubService.GetRepos("aco228");
-        var entry = data.FirstOrDefault(x => x.id == request);
-        if (entry == null)
-            throw new ActionErrorException($"Entry with id:{request} could not be found");
+        Log($"Executing DummyGithubAction with request: {request}");
         
+        var storeObj = GetData<bool?>("storeObj");
+        if (storeObj == null)
+        {
+            SetData("storeObj", true);
+            throw new ActionContinueException($"StoreObj is not set.");
+        }
+        
+
+        var post = await WebService.GetPostById(request);
         return new()
         {
-            id = entry.id,
-            full_name = entry.full_name,
-            description = entry.description,
+            id = post.id,
+            body = post.body,
+            completed = post.completed,
+            title = post.title,
+            userId = post.userId
         };
     }
 }

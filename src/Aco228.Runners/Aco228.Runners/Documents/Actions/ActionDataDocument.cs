@@ -10,7 +10,8 @@ namespace Aco228.Runners.Documents.Actions;
 public class ActionDataDocument : MongoDocument
 {
     public required ObjectId ActionId { get; set; }
-
+    
+    public Dictionary<string, ActionObjectModel> Data { get; set; } = new();
     public List<ActionDataDocumentLog> Logs { get; set; } = new();
 }
 

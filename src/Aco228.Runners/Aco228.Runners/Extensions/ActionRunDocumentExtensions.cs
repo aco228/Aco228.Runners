@@ -6,6 +6,9 @@ namespace Aco228.Runners.Extensions;
 
 public static class ActionRunDocumentExtensions
 {
+    public static bool IsCompleted(this ActionRunDocument document)
+        => document.Status == ActionStatus.Finished || document.Status == ActionStatus.Failed || document.Status == ActionStatus.Canceled;
+    
     public static bool TryReleaseLock(this ActionRunDocument actionDocument, int maximumMinutes)
     {
         if(string.IsNullOrEmpty(actionDocument.LockBy) || actionDocument.LockTimeTs == null)

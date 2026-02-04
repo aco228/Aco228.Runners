@@ -68,7 +68,7 @@ public static class Actions
             LastInteractionUtcTc = DT.GetUnix(),
             RequestType = action.RequestType.FullName!,
             ResponseType = action.ResponseType.FullName!,
-            Request = request,
+            Request = ActionObjectModelHelper.Get(request)!,
         };
         await ActionDocumentRepo.InsertOrUpdateAsync(actionDocument);
         return actionDocument;

@@ -29,7 +29,7 @@ internal class ActionDefinition
            || !ActionAssembliesData.TryGetType(Document.ResponseType, out var responseType))
         {
             Document.Status = ActionStatus.Failed;
-            await Document.SetErrorWithMessage("Fatal. Type not found");
+            await Document.MoveToFailed("Fatal. Type not found");
             return true;
         }
         
@@ -53,7 +53,7 @@ internal class ActionDefinition
         var action = Helpers.Actions.GetByType(ActionType);
         var backgroundServiceManager = new BackgroundServiceActionManager(this);
         await backgroundServiceManager.Initialize();
-        await action.ExecuteInBackground(backgroundServiceManager);
+        var result = await action.ExecuteInBackground(backgroundServiceManager);
         RunningActionCollection.Remove(this);
     }
     

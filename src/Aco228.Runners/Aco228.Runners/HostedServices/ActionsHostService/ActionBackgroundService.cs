@@ -45,10 +45,11 @@ public class ActionBackgroundService : HostServiceBase
 
         await foreach (var actionDefinition in _loader.CollectActionDocument().WithCancellation(CancellationToken))
         {
+            if(RunningActions.Count >= MAXIMUM_ACTIONS_PER_EXECUTION)
+                break;
+            
             actionDefinition.TryStart(CancellationToken, RunningActions);
             Console.WriteLine($"   >>> Starting action: {actionDefinition.Name}");
-            if(RunningActions.Count == runningCount)
-                break;
         }
         
         await ActionDocumentTransactionalManager.FinishAsync();
