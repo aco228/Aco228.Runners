@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.Runners.Consoler", "Aco228.Runners.Consoler\Aco228.Runners.Consoler.csproj", "{60675231-4E5B-4403-BD78-81D74FB3C662}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.Runners", "Aco228.Runners\Aco228.Runners.csproj", "{19F42FE3-8309-464B-AA92-6D44055B5C69}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{2D785C4A-0ED9-44DB-8363-C5217B7729C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.Common", "..\..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj", "{79E86238-2351-48AF-86F1-003BA205B449}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.MongoDb", "..\..\..\Aco228.v2.MongoDb\src\Aco228.v2.MongoDb\Aco228.MongoDb\Aco228.MongoDb.csproj", "{63DE6B29-86EA-4B61-BA42-F595C642FCB2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60675231-4E5B-4403-BD78-81D74FB3C662}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60675231-4E5B-4403-BD78-81D74FB3C662}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60675231-4E5B-4403-BD78-81D74FB3C662}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60675231-4E5B-4403-BD78-81D74FB3C662}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19F42FE3-8309-464B-AA92-6D44055B5C69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19F42FE3-8309-464B-AA92-6D44055B5C69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19F42FE3-8309-464B-AA92-6D44055B5C69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19F42FE3-8309-464B-AA92-6D44055B5C69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79E86238-2351-48AF-86F1-003BA205B449}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79E86238-2351-48AF-86F1-003BA205B449}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79E86238-2351-48AF-86F1-003BA205B449}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79E86238-2351-48AF-86F1-003BA205B449}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63DE6B29-86EA-4B61-BA42-F595C642FCB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63DE6B29-86EA-4B61-BA42-F595C642FCB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63DE6B29-86EA-4B61-BA42-F595C642FCB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63DE6B29-86EA-4B61-BA42-F595C642FCB2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79E86238-2351-48AF-86F1-003BA205B449} = {2D785C4A-0ED9-44DB-8363-C5217B7729C5}
+		{63DE6B29-86EA-4B61-BA42-F595C642FCB2} = {2D785C4A-0ED9-44DB-8363-C5217B7729C5}
+	EndGlobalSection
+EndGlobal
