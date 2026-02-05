@@ -19,7 +19,6 @@ public class ActionBackgroundServiceLoader
         _service = service;
         _loadSpec = _service.ActionDocumentRepo.Load()
             .FilterBy(x => ActionStatusExtensions.GetRunnableActions().Contains(x.Status))
-            .FilterBy(x => x.IsContextGroup)
             .OrderByPropertyAsc(x => x.LastInteractionUtcTc);
     }
     
@@ -48,7 +47,7 @@ public class ActionBackgroundServiceLoader
         var currentTs = DT.GetUnix();
         var scheduledActions = await _service.ActionDocumentRepo.Load()
             .FilterBy(x => !string.IsNullOrEmpty(x.LockBy) && x.LockBy.Equals(_service.MachineContract.MachineName))
-            .FilterBy(x => x.WaitUntilTs != null && x.WaitUntilTs >= currentTs)
+            .FilterBy(x => x.WaitUntilTs == null || x.WaitUntilTs <= currentTs)
             .ToListAsync();
         
         var currentScheduledCount = scheduledActions.Count;
@@ -67,7 +66,7 @@ public class ActionBackgroundServiceLoader
             result.Add(definition);
         }
 
-        var maximumScheduleActions = ActionBackgroundService.MAXIMUM_ACTIONS_PER_EXECUTION - currentScheduledCount;
+        var maximumScheduleActions = ActionBackgroundService.MAXIMUM_ACTIONS_PER_EXECUTION - currentScheduledCount + 2;
         var scheduledCount = 0;
         
         await foreach (var actionDocument in _loadSpec
@@ -76,6 +75,9 @@ public class ActionBackgroundServiceLoader
         {
             if (actionDocument.TryReleaseLock(ActionBackgroundService.MAXIMUM_EXECUTION_TIME_MIN))
                 await _service.ActionDocumentTransactionalManager.InsertOrUpdateAsync(actionDocument);
+            
+            if (actionDocument.ActionDependencies.Any())
+                continue;
 
             if (_service.RunningActions.ContainsCategory(actionDocument))
                 continue;

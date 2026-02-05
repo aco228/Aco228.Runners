@@ -17,23 +17,22 @@ public class DummyActionResponse
 public class DummyGithubAction : ActionBase<int, DummyActionResponse>
 {
     protected override ushort MaximumNumberOfErrorRetries => 3;
-    protected override TimeSpan DelayBetweenExecutions => TimeSpan.FromSeconds(15);
+    protected override TimeSpan DelayBetweenExecutions => TimeSpan.FromSeconds(8);
     
     [InjectService] public IDummyApiService WebService { get; set; }
     
     protected override async Task<DummyActionResponse> ExecuteInternal(int request)
     {
         Log($"Executing DummyGithubAction with request: {request}");
-        
-        var storeObj = GetData<bool?>("storeObj");
-        if (storeObj == null)
+        if (ActionManager.GetActionDocument()?.ParentId == null)
         {
-            SetData("storeObj", true);
-            throw new ActionContinueException($"StoreObj is not set.");
+            var plus1 = RequestAction<DummyGithubAction, DummyActionResponse>(request++, "plus1");
+            var plus2 = RequestAction<DummyGithubAction, DummyActionResponse>(request++, "plus2");   
         }
         
+        var post = await GetDataOr("webRequest", () => WebService.GetPostById(request));
+        GuardActionResults();
 
-        var post = await WebService.GetPostById(request);
         return new()
         {
             id = post.id,

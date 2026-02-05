@@ -39,8 +39,13 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
                 result = await ExecuteInternal(request);
                 if (result == null)
                     throw new InvalidOperationException("Action returned null");
-                
+
                 await ActionManager.OnResultReceived(result);
+                break;
+            }
+            catch (ActionDependencyGuardException ex)
+            {
+                await ActionManager.ChangeStatus(ActionStatus.Waiting, ex.Message);
                 break;
             }
             catch (ActionContinueException ex)
@@ -81,17 +86,47 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
 
     protected T? GetData<T>(string key)
     {
-        if(ActionManager is BackgroundServiceActionManager manager)
+        if(ActionManager is ActionServiceManager manager)
             return manager.GetStoreObject<T>(key);
         return default;
+    }
+
+    protected async Task<T?> GetDataOr<T>(string key, Func<Task<T>> task)
+    {
+        T? result = GetData<T>(key);
+        if (result != null)
+            return result;
+        
+        result = await task();
+        SetData(key, result);
+        return result;
     }
     
     protected void SetData<T>(string key, T value)
     {
-        if (ActionManager is BackgroundServiceActionManager manager)
+        if (ActionManager is ActionServiceManager manager)
             manager.SetStoreObject<T>(key, value);
     }
-    
+
+    protected TRes? RequestAction<TAction, TRes>(object input, string key = null)
+        where TAction : IAction
+    {
+        if (!(ActionManager is ActionServiceManager manager))
+            return default;
+        
+        if(string.IsNullOrEmpty(key))
+            key = Name;
+        
+        return manager.TryGetActionResult<TAction, TRes>(input, key);
+    }
+
+    protected void GuardActionResults()
+    {
+        if (!(ActionManager is ActionServiceManager manager))
+            return;
+
+        manager.GuardActionResults();
+    }
     
     
     public async Task<object?> ExecuteInBackground(IActionManager actionManager, CancellationToken cancellationToken)

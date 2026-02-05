@@ -12,6 +12,7 @@ public class ActionDataDocument : MongoDocument
     public required ObjectId ActionId { get; set; }
     
     public Dictionary<string, ActionObjectModel> Data { get; set; } = new();
+    public Dictionary<string, ActionObjectModel?> ActionData { get; set; } = new();
     public List<ActionDataDocumentLog> Logs { get; set; } = new();
 }
 

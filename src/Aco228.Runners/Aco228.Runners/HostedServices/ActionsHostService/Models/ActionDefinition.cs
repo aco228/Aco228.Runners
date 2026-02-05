@@ -52,7 +52,7 @@ internal class ActionDefinition
         try
         {
             var action = Helpers.Actions.GetByType(ActionType);
-            var backgroundServiceManager = new BackgroundServiceActionManager(this);
+            var backgroundServiceManager = new ActionServiceManager(this);
             await backgroundServiceManager.Initialize();
             var result = await action.ExecuteInBackground(backgroundServiceManager, cancellationToken);
         }

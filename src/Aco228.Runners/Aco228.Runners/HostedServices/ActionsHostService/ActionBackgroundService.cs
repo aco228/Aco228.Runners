@@ -2,7 +2,6 @@
 using Aco228.MongoDb.Services;
 using Aco228.Runners.Documents.Actions;
 using Aco228.Runners.Documents.Machine;
-using Aco228.Runners.Helpers;
 using Aco228.Runners.HostedServices.Core;
 using Aco228.Runners.Services;
 
@@ -10,10 +9,10 @@ namespace Aco228.Runners.HostedServices.ActionsHostService;
 
 public class ActionBackgroundService : HostServiceBase
 {
-    internal static TimeSpan ExecuteInterval => TimeSpan.FromSeconds(15);
     internal static ushort MAXIMUM_EXECUTION_TIME_MIN = 15;
     internal static ushort MAXIMUM_ACTIONS_PER_EXECUTION = 1;
-    
+    protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
+
     internal IMongoRepo<ActionRunDocument> ActionDocumentRepo { get; private set; }
     internal HostMachineContract MachineContract { get; private set; }
     internal IMongoRepoTransactionalManager<ActionRunDocument> ActionDocumentTransactionalManager { get; private set; }

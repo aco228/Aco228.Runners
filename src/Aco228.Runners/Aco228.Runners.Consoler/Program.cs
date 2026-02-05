@@ -24,6 +24,5 @@ builder.ConfigureRunActionBackgroundServices(new()
 var provider = await builder.BuildCollection();
 
 var postId = new Random().Next(1, 100);
-
-await Actions.Get<DummyGithubAction>().Schedule(postId, Guid.NewGuid().ToString());
+// await Actions.Get<DummyGithubAction>().Schedule(postId, Guid.NewGuid().ToString());
 await HostedServiceRunner.RunAsync(provider);

@@ -1,4 +1,5 @@
 ﻿using Aco228.MongoDb.Models.Attributes;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Aco228.Runners.Documents.Actions;
@@ -15,6 +16,7 @@ public class ActionRunDocument : ActionDocumentBase
     public required string RequestType { get; set; }
     public required string ResponseType { get; set; }
     public required ActionObjectModel Request { get; set; }
+    public HashSet<ObjectId> ActionDependencies { get; set; } = new();
     
     public string? LockBy { get; set; }
     public long? LockTimeTs { get; set; }
