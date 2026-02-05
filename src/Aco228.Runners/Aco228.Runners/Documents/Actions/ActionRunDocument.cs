@@ -19,4 +19,5 @@ public class ActionRunDocument : ActionDocumentBase
     public string? LockBy { get; set; }
     public long? LockTimeTs { get; set; }
     public long? ExecutionStartedTs { get; set; }
+    public long? WaitUntilTs { get; set; }
 }

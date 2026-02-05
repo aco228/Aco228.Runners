@@ -41,7 +41,7 @@ internal class BackgroundServiceActionManager : IActionManager
     
     public ActionObjectModel? GetRequestObject() => _actionDocument.Request;
     
-    public async Task OnExecutionStarted()
+    public async Task OnStart()
     {
         Console.WriteLine("Executionstarted::");
         _actionDocument.Status = ActionStatus.Executing;
@@ -92,10 +92,11 @@ internal class BackgroundServiceActionManager : IActionManager
         _actionDataDocument.Data[key] = ActionObjectModelHelper.Get(value)!;
     }
 
-    public async Task OnExit()
+    public async Task OnExit(long untilNextExecution)
     {
         if (!_actionDocument.IsCompleted())
         {
+            _actionDocument.WaitUntilTs = untilNextExecution;
             _actionDocument.ReleaseLock();
             await _actionRunDocumentRepo.InsertOrUpdateAsync(_actionDocument);
         }

@@ -1,9 +1,9 @@
-﻿using Aco228.Runners.Actions.ActionManager;
+﻿using Aco228.Common.Extensions;
+using Aco228.Runners.Actions.ActionManager;
 using Aco228.Runners.Actions.Exceptions;
 using Aco228.Runners.Documents.Actions;
 using Aco228.Runners.Extensions;
 using Aco228.Runners.Helpers;
-using Aco228.Runners.HostedServices.ActionsHostService.Models;
 
 namespace Aco228.Runners.Actions;
 
@@ -18,6 +18,7 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
     protected virtual ushort MaximumNumberOfErrorRetries { get; } = 1;
     private int ErrorCount { get; set; } = 0;
     protected virtual TimeSpan DelayBetweenRetries { get; } = TimeSpan.FromSeconds(15);
+    protected virtual TimeSpan DelayBetweenExecutions { get; } = TimeSpan.FromMinutes(5);
 
     public Task<TResponse> Execute(TRequest request)
     {
@@ -27,7 +28,7 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
     internal async Task<TResponse?> GetResponse(TRequest request)
     {
         TResponse? result = default;
-        await ActionManager.OnExecutionStarted();
+        await ActionManager.OnStart();
         for (;;)
         {
             if (ErrorCount >= MaximumNumberOfErrorRetries || ErrorCount > 20)
@@ -67,7 +68,8 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
             await Task.Delay(DelayBetweenRetries);
         }
 
-        await ActionManager.OnExit();
+        var untilNextExecution = DateTime.UtcNow.ToUnixTimestampMilliseconds() + (long)DelayBetweenExecutions.TotalMilliseconds;
+        await ActionManager.OnExit(untilNextExecution);
         return result;
     }
 

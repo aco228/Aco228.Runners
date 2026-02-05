@@ -17,6 +17,7 @@ public class DummyActionResponse
 public class DummyGithubAction : ActionBase<int, DummyActionResponse>
 {
     protected override ushort MaximumNumberOfErrorRetries => 3;
+    protected override TimeSpan DelayBetweenExecutions => TimeSpan.FromSeconds(15);
     
     [InjectService] public IDummyApiService WebService { get; set; }
     

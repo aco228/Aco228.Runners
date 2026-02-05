@@ -45,8 +45,10 @@ public class ActionBackgroundServiceLoader
 
     internal async Task<List<ActionDefinition>> CollectActionDocument()
     {
+        var currentTs = DT.GetUnix();
         var scheduledActions = await _service.ActionDocumentRepo.Load()
             .FilterBy(x => !string.IsNullOrEmpty(x.LockBy) && x.LockBy.Equals(_service.MachineContract.MachineName))
+            .FilterBy(x => x.WaitUntilTs != null && x.WaitUntilTs >= currentTs)
             .ToListAsync();
         
         var currentScheduledCount = scheduledActions.Count;
