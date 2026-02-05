@@ -17,14 +17,14 @@ public class ActionBackgroundServiceLoader
     public ActionBackgroundServiceLoader(ActionBackgroundService service)
     {
         _service = service;
-        _loadSpec = _service.ActionDocumentRepo.Load()
+        _loadSpec = _service.ActionDocumentRepo.NoTrack()
             .FilterBy(x => ActionStatusExtensions.GetRunnableActions().Contains(x.Status))
             .OrderByPropertyAsc(x => x.LastInteractionUtcTc);
     }
     
     public async Task ReleaseMachineLocks()
     {
-        var actions = await _service.ActionDocumentRepo.Load()
+        var actions = await _service.ActionDocumentRepo.NoTrack()
             .FilterBy(x => x.LockBy == _service.MachineContract.MachineName)
             .ToListAsync();
 
@@ -45,7 +45,7 @@ public class ActionBackgroundServiceLoader
     internal async Task<List<ActionDefinition>> CollectActionDocument()
     {
         var currentTs = DT.GetUnix();
-        var scheduledActions = await _service.ActionDocumentRepo.Load()
+        var scheduledActions = await _service.ActionDocumentRepo.NoTrack()
             .FilterBy(x => !string.IsNullOrEmpty(x.LockBy) && x.LockBy.Equals(_service.MachineContract.MachineName))
             .FilterBy(x => x.WaitUntilTs == null || x.WaitUntilTs <= currentTs)
             .ToListAsync();

@@ -6,11 +6,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.Runners", "Aco228.Ru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{2D785C4A-0ED9-44DB-8363-C5217B7729C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.Common", "..\..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj", "{79E86238-2351-48AF-86F1-003BA205B449}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.Common", "..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj", "{79E86238-2351-48AF-86F1-003BA205B449}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.MongoDb", "..\..\..\Aco228.v2.MongoDb\src\Aco228.v2.MongoDb\Aco228.MongoDb\Aco228.MongoDb.csproj", "{63DE6B29-86EA-4B61-BA42-F595C642FCB2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.MongoDb", "..\..\Aco228.v2.MongoDb\src\Aco228.v2.MongoDb\Aco228.MongoDb\Aco228.MongoDb.csproj", "{63DE6B29-86EA-4B61-BA42-F595C642FCB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.WService", "..\..\..\Aco228.WService\src\Aco228.WService\Aco228.WService\Aco228.WService.csproj", "{D6F66A82-2BED-4CE9-A763-15A1FB3449DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aco228.WService", "..\..\Aco228.WService\src\Aco228.WService\Aco228.WService\Aco228.WService.csproj", "{D6F66A82-2BED-4CE9-A763-15A1FB3449DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

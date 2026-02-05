@@ -11,8 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj" />
-      <ProjectReference Include="..\..\..\..\Aco228.v2.MongoDb\src\Aco228.v2.MongoDb\Aco228.MongoDb\Aco228.MongoDb.csproj" />
+      <ProjectReference Include="..\..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj" />
+      <ProjectReference Include="..\..\..\Aco228.v2.MongoDb\src\Aco228.v2.MongoDb\Aco228.MongoDb\Aco228.MongoDb.csproj" />
     </ItemGroup>
 
     <ItemGroup>
