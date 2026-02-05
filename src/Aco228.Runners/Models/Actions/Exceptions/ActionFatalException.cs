@@ -1,4 +1,4 @@
-﻿namespace Aco228.Runners.Models.Actions;
+﻿namespace Aco228.Runners.Models.Actions.Exceptions;
 
 public class ActionFatalException : Exception
 {

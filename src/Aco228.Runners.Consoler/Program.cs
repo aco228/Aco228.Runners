@@ -22,10 +22,10 @@ builder.ConfigureRunActionBackgroundServices(new()
 });
 var provider = await builder.BuildCollection();
 
-await Actions.Get<CollectGithubAction>().GetResultAsync(15);
+await Actions.Get<CollectGithubAction>().GetPromiseFor(15);
 
 
 //
 // var postId = new Random().Next(1, 100);
 // // await Actions.Get<DummyGithubAction>().Schedule(postId, Guid.NewGuid().ToString());
-// await HostedServiceRunner.RunAsync(provider);
+// await HostedServiceRunner.RunAsync(provider);;

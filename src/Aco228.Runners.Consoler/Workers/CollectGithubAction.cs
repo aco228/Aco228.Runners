@@ -1,6 +1,7 @@
 ﻿using Aco228.Common.Attributes;
 using Aco228.Runners.Consoler.WebServices;
 using Aco228.Runners.Core;
+using Aco228.Runners.Core.Actions;
 
 namespace Aco228.Runners.Consoler.Workers;
 
@@ -19,6 +20,8 @@ public class CollectGithubAction : ActionResponseBase<int, DummyActionResponse>
     
     protected override async Task<DummyActionResponse?> ExecuteInternal(int request)
     {
+        var storeVal = await State.GetFromStore<DummyActionResponse>("postId");
+        
         var post = await WebService.GetPostById(request);
         return new()
         {

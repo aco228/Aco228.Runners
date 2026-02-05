@@ -1,6 +1,6 @@
 ﻿using Aco228.Runners.Models;
 
-namespace Aco228.Runners.Core;
+namespace Aco228.Runners.Core.Actions;
 
 public enum ActionType
 {
@@ -23,7 +23,11 @@ public abstract class ActionBase : IAction
     public string Name { get; set; }
     public Type RequestType { get; set; }
     public Type ResponseType { get; set; }
+    
+    public ActionStateManager State { get; internal set; }
 
     internal abstract Task ExecuteAction(ActionRequestModel request);
     internal virtual object? GetResult() => null;
+    
+    
 }

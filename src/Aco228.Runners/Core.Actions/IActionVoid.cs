@@ -1,7 +1,7 @@
 ﻿using Aco228.Runners.Models;
-using Aco228.Runners.Models.Actions;
+using Aco228.Runners.Models.Actions.Exceptions;
 
-namespace Aco228.Runners.Core;
+namespace Aco228.Runners.Core.Actions;
 
 public interface IActionVoid<TRequest> : IAction
 {
