@@ -1,4 +1,5 @@
-﻿using Aco228.Runners.Models;
+﻿using Aco228.Runners.Documents;
+using Aco228.Runners.Models;
 using Aco228.Runners.Models.Actions.Exceptions;
 
 namespace Aco228.Runners.Core.Actions;
@@ -12,9 +13,9 @@ public abstract class ActionVoidBase<TRequest> : ActionBase, IActionVoid<TReques
 {
     public override ActionType Type => ActionType.Void;
 
-    internal override Task ExecuteAction(ActionRequestModel request)
+    internal override Task ExecuteAction(ActionObjectModel request)
     {
-        var requestModel = request.GetRequest<TRequest>();
+        var requestModel = request.Get<TRequest>();
         if (requestModel == null)
             throw new ActionFatalException($"Request model is wrong or missing");
         

@@ -1,4 +1,5 @@
-﻿using Aco228.Runners.Models;
+﻿using Aco228.Runners.Documents;
+using Aco228.Runners.Models;
 using Aco228.Runners.Models.Actions;
 using Aco228.Runners.Models.Actions.Exceptions;
 
@@ -17,9 +18,9 @@ public abstract class ActionResponseBase<TRequest, TResponse> : ActionBase, IAct
     internal override object? GetResult() => _result;
     protected abstract Task<TResponse?> ExecuteInternal(TRequest request);
 
-    internal override async Task ExecuteAction(ActionRequestModel request)
+    internal override async Task ExecuteAction(ActionObjectModel request)
     {
-        var requestModel = request.GetRequest<TRequest>();
+        var requestModel = request.Get<TRequest>();
         if(requestModel == null)
             throw new ActionFatalException($"Request model is wrong or missing");
         

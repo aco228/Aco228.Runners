@@ -1,4 +1,5 @@
-﻿using Aco228.Runners.Models;
+﻿using Aco228.Runners.Documents;
+using Aco228.Runners.Models;
 
 namespace Aco228.Runners.Core.Actions;
 
@@ -26,7 +27,7 @@ public abstract class ActionBase : IAction
     
     public ActionStateManager State { get; internal set; }
 
-    internal abstract Task ExecuteAction(ActionRequestModel request);
+    internal abstract Task ExecuteAction(ActionObjectModel request);
     internal virtual object? GetResult() => null;
     
     
