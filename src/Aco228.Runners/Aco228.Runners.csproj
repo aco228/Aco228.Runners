@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Core\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\Aco228.Common\src\Aco228.Common\Aco228.Common.csproj" />
       <ProjectReference Include="..\..\..\Aco228.v2.MongoDb\src\Aco228.v2.MongoDb\Aco228.MongoDb\Aco228.MongoDb.csproj" />
     </ItemGroup>
@@ -18,6 +14,10 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\" />
     </ItemGroup>
 
 </Project>

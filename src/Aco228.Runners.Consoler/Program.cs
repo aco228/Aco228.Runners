@@ -2,10 +2,9 @@
 
 using Aco228.Common.Extensions;
 using Aco228.Runners;
-using Aco228.Runners.Consoler.Actions;
 using Aco228.Runners.Consoler.Db;
+using Aco228.Runners.Consoler.Workers;
 using Aco228.Runners.Helpers;
-using Aco228.Runners.HostedServices;
 using Aco228.WService;
 using DotNetEnv;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +22,10 @@ builder.ConfigureRunActionBackgroundServices(new()
 });
 var provider = await builder.BuildCollection();
 
-var postId = new Random().Next(1, 100);
-// await Actions.Get<DummyGithubAction>().Schedule(postId, Guid.NewGuid().ToString());
-await HostedServiceRunner.RunAsync(provider);
+await Actions.Get<CollectGithubAction>().GetResultAsync(15);
+
+
+//
+// var postId = new Random().Next(1, 100);
+// // await Actions.Get<DummyGithubAction>().Schedule(postId, Guid.NewGuid().ToString());
+// await HostedServiceRunner.RunAsync(provider);
