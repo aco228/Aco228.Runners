@@ -9,7 +9,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Aco228.WService\src\Aco228.WService\Aco228.WService\Aco228.WService.csproj" />
-      <ProjectReference Include="..\..\Aco228.WService\src\Aco228.WService\Aco228.WService\Aco228.WService.csproj" />
       <ProjectReference Include="..\Aco228.Runners\Aco228.Runners.csproj" />
     </ItemGroup>
 

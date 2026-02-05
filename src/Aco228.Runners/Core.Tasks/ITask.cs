@@ -1,44 +1,76 @@
-﻿using Aco228.Common.Extensions;
+﻿using Aco228.Runners.Extensions;
+using Aco228.Runners.Helpers.Tasks;
+using Aco228.Runners.Models.Timings;
 
 namespace Aco228.Runners.Core.Tasks;
 
 public interface ITask
 {
-    Task ExecuteTask();
+    Task ExecuteTask(bool forceExecute = false);
 }
 
 public abstract class TaskBase : ITask
 {
-    protected virtual ushort MaximumNumberOfErrorRetries { get; } = 1;
-    private int ErrorCount { get; set; } = 0;
-    protected virtual TimeSpan DelayBetweenRetries { get; } = TimeSpan.FromSeconds(15);
-    protected virtual TimeSpan DelayBetweenExecutions { get; } = TimeSpan.FromMinutes(5);
-
-    protected abstract Task ExecuteInternal();
+    internal string Name { get; set; }
+    public virtual HourWindow From { get; } = HourWindow.DayStart;
+    public virtual HourWindow To { get; } = HourWindow.DayEnd;
+    public virtual DelayWindow Delay { get; } = new(1, DelayType.Hours);
+    public virtual List<DayOfWeek>? OnlyOnDays { get;  } = null;
+    public virtual string? Category { get; } = null; 
     
-    public async Task ExecuteTask()
-    {
-        for (;;)
-        {
-            if (ErrorCount >= MaximumNumberOfErrorRetries || ErrorCount > 20)
-                break;
+    internal ITaskDefinition? TaskDefinition { get; set; } 
+    internal virtual bool RunSync { get; } = false;
+    internal DateTime StartTime { get; set; }
+    internal bool IsRunning { get; set; } = false;
+    internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
+    public DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc;
 
-            try
-            {
-                await ExecuteInternal();
-            }
-            catch (Exception ex)
-            {
-                ErrorCount++;
-                if (ErrorCount >= MaximumNumberOfErrorRetries)
-                {
-                    break;
-                }
-            }
-            
-            await Task.Delay(DelayBetweenRetries);
+    protected abstract Task InternalExecute();
+    protected virtual bool CanRun() => true;
+    protected virtual Task OnFinish() => Task.FromResult(true);
+    
+    public Task ExecuteTask(bool forceExecute = false)
+        => ExecuteTask(Name, CancellationToken.None, forceExecute);
+    
+    internal async Task ExecuteTask(string name, CancellationToken cancellationToken, bool forceExecute = false, bool? runAsync = null)
+    {
+        Name = name;
+        StartTime = DateTime.Now;
+
+        if (CanRun() && (!forceExecute && !this.IsTimeOkay()) || IsRunning)
+        {
+            return;
         }
 
-        var untilNextExecution = DateTime.UtcNow.ToUnixTimestampMilliseconds() + (long)DelayBetweenExecutions.TotalMilliseconds;;
+        try
+        {
+            IsRunning = true;
+            var runAsyncValue = runAsync ?? RunSync;
+
+            if (runAsyncValue)
+                await InternalExecute();
+            else
+                await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
+
+        }
+        catch (Exception ex)
+        {
+            ConsoleLog("");
+            ConsoleLog("");
+            ConsoleLog("");
+            ConsoleLog($" [ENGINE]: Error: {ex}");
+            ConsoleLog("[ENGINE]: " + ex.StackTrace);
+            ConsoleLog("");
+            ConsoleLog("");
+            ConsoleLog("");
+        }
+
+        await OnFinish();
+        TaskDefinition?.Update();
+    }
+    
+    public virtual void ConsoleLog(string message)
+    {
+        TaskConsoleHelper.Log(message);
     }
 }

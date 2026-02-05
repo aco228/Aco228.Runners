@@ -3,6 +3,7 @@
 using Aco228.Common.Extensions;
 using Aco228.Runners;
 using Aco228.Runners.Consoler.Db;
+using Aco228.Runners.Consoler.Tasks;
 using Aco228.Runners.Consoler.Workers;
 using Aco228.Runners.Helpers;
 using Aco228.WService;
@@ -22,7 +23,10 @@ builder.ConfigureRunActionBackgroundServices(new()
 });
 var provider = await builder.BuildCollection();
 
-await Actions.Get<CollectGithubAction>().GetPromiseFor(15);
+
+await RunTasks.Execute<TestTask>();
+// await Actions.Get<CollectGithubAction>().GetPromiseFor(15);
+int a = 0;
 
 
 //
