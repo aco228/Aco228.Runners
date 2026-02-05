@@ -29,9 +29,10 @@ public abstract class ActionResponseBase<TRequest, TResponse> : ActionBase, IAct
     
     public Task<TResponse?> GetResultAsync(TRequest request) => ExecuteInternal(request);
 
-    public async Task<ActionPromise> GetPromiseFor(TRequest request)
+
+    public async Task<TResponse?> GetPromiseResult(ActionStateManager stateManager, string key, TRequest request)
     {
-        return null;
+        return default;
     }
     
     

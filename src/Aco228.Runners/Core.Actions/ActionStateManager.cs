@@ -9,7 +9,4 @@ public class ActionStateManager
     
     public virtual async Task SetToStore<T>(string key, T value) { }
     
-    public async Task OnStart() => await Task.CompletedTask;
-    public async Task OnFatal(Exception ex) => await Task.CompletedTask;
-    public async Task OnExit() => await Task.CompletedTask;
 }

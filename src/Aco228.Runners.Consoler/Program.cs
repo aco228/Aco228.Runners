@@ -5,6 +5,7 @@ using Aco228.Runners;
 using Aco228.Runners.Consoler.Db;
 using Aco228.Runners.Consoler.Tasks;
 using Aco228.Runners.Consoler.Workers;
+using Aco228.Runners.Core.Actions;
 using Aco228.Runners.Helpers;
 using Aco228.WService;
 using DotNetEnv;
@@ -24,8 +25,9 @@ builder.ConfigureRunActionBackgroundServices(new()
 var provider = await builder.BuildCollection();
 
 
-await RunTasks.Execute<TestTask>();
-// await Actions.Get<CollectGithubAction>().GetPromiseFor(15);
+// await RunTasks.Execute<TestTask>();
+var actionManager = new ActionStateManager();
+var result = await Actions.Get<CollectGithubAction>().GetPromiseResult(actionManager, "postId", 1);
 int a = 0;
 
 

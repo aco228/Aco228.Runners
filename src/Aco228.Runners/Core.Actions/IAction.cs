@@ -24,8 +24,8 @@ public abstract class ActionBase : IAction
     public string Name { get; set; }
     public Type RequestType { get; set; }
     public Type ResponseType { get; set; }
-    
-    public ActionStateManager State { get; internal set; }
+
+    public ActionStateManager State { get; internal set; } = new();
 
     internal abstract Task ExecuteAction(ActionObjectModel request);
     internal virtual object? GetResult() => null;
