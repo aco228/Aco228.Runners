@@ -16,7 +16,6 @@ public class ActionBackgroundService : HostServiceBase
     
     internal IMongoRepo<ActionRunDocument> ActionDocumentRepo { get; private set; }
     internal HostMachineContract MachineContract { get; private set; }
-    internal CancellationToken CancellationToken { get; private set; }
     internal IMongoRepoTransactionalManager<ActionRunDocument> ActionDocumentTransactionalManager { get; private set; }
     internal RunningActionCollection RunningActions { get; set; } = new();
     private ActionBackgroundServiceLoader _loader;
@@ -31,7 +30,6 @@ public class ActionBackgroundService : HostServiceBase
         RunnableActionStatues = ActionStatusExtensions.GetRunnableActions();
 
         _loader = new(this);
-        GetExecutableActionsHelper.Initialize(ActionDocumentRepo);
         await _loader.ReleaseMachineLocks();
     }
 
@@ -43,13 +41,14 @@ public class ActionBackgroundService : HostServiceBase
         if(runningCount >= MAXIMUM_ACTIONS_PER_EXECUTION)
             return;
 
-        await foreach (var actionDefinition in _loader.CollectActionDocument().WithCancellation(CancellationToken))
+        foreach (var actionDefinition in await _loader.CollectActionDocument())
         {
             if(RunningActions.Count >= MAXIMUM_ACTIONS_PER_EXECUTION)
                 break;
             
-            actionDefinition.TryStart(CancellationToken, RunningActions);
+            actionDefinition.Start(CancellationToken, RunningActions);
             Console.WriteLine($"   >>> Starting action: {actionDefinition.Name}");
+            await Task.Delay(TimeSpan.FromMilliseconds(200), CancellationToken);
         }
         
         await ActionDocumentTransactionalManager.FinishAsync();

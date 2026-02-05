@@ -32,7 +32,7 @@ public static class ActionRunDocumentExtensions
         actionDocument.ReleaseLock();
         actionDocument.LockBy = lockKey;
         actionDocument.LockTimeTs = DT.GetUnix();
-        actionDocument.Status = ActionStatus.ScheduleLock;
+        actionDocument.Status = ActionStatus.Waiting;
         return true;
     }
 
@@ -41,7 +41,7 @@ public static class ActionRunDocumentExtensions
         actionDocument.ExecutionStartedTs = null;
         actionDocument.LockBy = null;
         actionDocument.LockTimeTs = null;
-        actionDocument.Status = ActionStatus.Scheduled;
+        actionDocument.Status = ActionStatus.Waiting;
         return actionDocument;
     }
 }

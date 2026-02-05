@@ -44,6 +44,7 @@ internal class BackgroundServiceActionManager : IActionManager
     public async Task OnExecutionStarted()
     {
         Console.WriteLine("Executionstarted::");
+        _actionDocument.Status = ActionStatus.Executing;
         _actionDocument.ExecutionStartedTs = DT.GetUnix();
         await _actionRunDocumentRepo.InsertOrUpdateAsync(_actionDocument);
     }

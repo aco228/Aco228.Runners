@@ -47,13 +47,6 @@ public static class Actions
         return service;
     }
 
-    public static async Task<object?> ExecuteUnknownAction(object action, object request)
-    {
-        var objectType = action.GetType();
-        var method = objectType.GetMethod("Execute", new[] { request.GetType() });
-        return method?.Invoke(action, new[] { request }) ?? default;
-    }
-
     internal static async Task<ActionRunDocument> ScheduleInternal<T>(this T action, object request, string? reference = null)
         where T : IAction
     {
@@ -62,7 +55,7 @@ public static class Actions
             Name = action.Name,
             ActionCategory = action.Category,
             TypeDescription = action.GetType().FullName!,
-            Status = ActionStatus.Scheduled,
+            Status = ActionStatus.Waiting,
             IsContextGroup = true,
             Reference = reference,
             LastInteractionUtcTc = DT.GetUnix(),

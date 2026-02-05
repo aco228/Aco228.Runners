@@ -24,8 +24,9 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
         return GetResponse(request);
     }
     
-    internal async Task<TResponse> GetResponse(TRequest request)
+    internal async Task<TResponse?> GetResponse(TRequest request)
     {
+        TResponse? result = default;
         await ActionManager.OnExecutionStarted();
         for (;;)
         {
@@ -34,12 +35,12 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
 
             try
             {
-                var result = await ExecuteInternal(request);
-                if (result != null)
-                {
-                    await ActionManager.OnResultReceived(result);
-                    return result;
-                }
+                result = await ExecuteInternal(request);
+                if (result == null)
+                    throw new InvalidOperationException("Action returned null");
+                
+                await ActionManager.OnResultReceived(result);
+                break;
             }
             catch (ActionContinueException ex)
             {
@@ -59,7 +60,7 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
                     await ActionManager.OnFatalError($"Exception occurred {ErrorCount} times. " + ex.Message);
                     break;
                 }
-                
+
                 await ActionManager.OnError(ex);
             }
             
@@ -67,7 +68,7 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
         }
 
         await ActionManager.OnExit();
-        return default;
+        return result;
     }
 
     public Task<ActionRunDocument> Schedule(TRequest request, string? reference = null)
@@ -91,7 +92,7 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
     
     
     
-    public async Task<object?> ExecuteInBackground(IActionManager actionManager)
+    public async Task<object?> ExecuteInBackground(IActionManager actionManager, CancellationToken cancellationToken)
     {
         ActionManager = actionManager;
         var request = actionManager.GetRequestObject().Get<TRequest>();
@@ -103,6 +104,6 @@ public abstract class ActionBase<TRequest, TResponse> : IAction
         
         ErrorCount = ActionManager.GetActionDocument().ErrorCount;
         ActionManager = actionManager;
-        return await GetResponse(request);
+        return await GetResponse(request).WaitAsync(cancellationToken);
     }
 }

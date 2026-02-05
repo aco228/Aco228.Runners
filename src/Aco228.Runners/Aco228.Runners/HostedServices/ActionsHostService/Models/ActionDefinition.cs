@@ -40,21 +40,26 @@ internal class ActionDefinition
         return false;
     }
 
-    public bool TryStart(CancellationToken cancellationToken, RunningActionCollection runningActions)
+    public void Start(CancellationToken cancellationToken, RunningActionCollection runningActions)
     {
         RunningActionCollection = runningActions;
-        RunningTask = Execute().WaitAsync(cancellationToken);
+        RunningTask = Execute(cancellationToken).WaitAsync(cancellationToken);
         RunningActionCollection.Add(this);
-        return false;
     }
 
-    private async Task Execute()
+    private async Task Execute(CancellationToken cancellationToken)
     {
-        var action = Helpers.Actions.GetByType(ActionType);
-        var backgroundServiceManager = new BackgroundServiceActionManager(this);
-        await backgroundServiceManager.Initialize();
-        var result = await action.ExecuteInBackground(backgroundServiceManager);
-        RunningActionCollection.Remove(this);
+        try
+        {
+            var action = Helpers.Actions.GetByType(ActionType);
+            var backgroundServiceManager = new BackgroundServiceActionManager(this);
+            await backgroundServiceManager.Initialize();
+            var result = await action.ExecuteInBackground(backgroundServiceManager, cancellationToken);
+        }
+        finally
+        {
+            RunningActionCollection.Remove(this);
+        }
     }
     
 }

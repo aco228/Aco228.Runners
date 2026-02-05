@@ -43,13 +43,14 @@ public class ActionBackgroundServiceLoader
     }
 
 
-    internal async IAsyncEnumerable<ActionDefinition> CollectActionDocument()
+    internal async Task<List<ActionDefinition>> CollectActionDocument()
     {
         var scheduledActions = await _service.ActionDocumentRepo.Load()
             .FilterBy(x => !string.IsNullOrEmpty(x.LockBy) && x.LockBy.Equals(_service.MachineContract.MachineName))
             .ToListAsync();
         
         var currentScheduledCount = scheduledActions.Count;
+        var result = new List<ActionDefinition>();
         
         foreach (var scheduledAction in scheduledActions)
         {
@@ -61,7 +62,7 @@ public class ActionBackgroundServiceLoader
             if (await definition.HasTypeProblem())
                 continue;
             
-            yield return definition;
+            result.Add(definition);
         }
 
         var maximumScheduleActions = ActionBackgroundService.MAXIMUM_ACTIONS_PER_EXECUTION - currentScheduledCount;
@@ -90,6 +91,7 @@ public class ActionBackgroundServiceLoader
         }
         
         await _service.ActionDocumentTransactionalManager.FinishAsync();
+        return result;
     }
 
 
