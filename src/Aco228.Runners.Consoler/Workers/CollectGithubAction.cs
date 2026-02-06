@@ -24,7 +24,7 @@ public class CollectGithubAction : ActionResponseBase<int, DummyActionResponse>
         var actionResult = await Actions.Get<CollectGithubAction>().GetPromiseResult(State, "postId", request);
         var storeVal = await State.GetFromStore<DummyActionResponse>("postId");
         
-        var post = await WebService.GetPostById(request);
+        var  post = await WebService.GetPostById(request);
         return new()
         {
             id = post.id,
