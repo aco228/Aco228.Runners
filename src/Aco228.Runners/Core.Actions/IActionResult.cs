@@ -10,7 +10,7 @@ public interface IActionResult<TRequest, TResponse> : IAction
     
 }
 
-public abstract class ActionResponseBase<TRequest, TResponse> : ActionBase, IActionResult<TRequest, TResponse>
+public abstract class ActionResultBase<TRequest, TResponse> : ActionBase, IActionResult<TRequest, TResponse>
 {
     public override ActionType Type => ActionType.Result;
     private TResponse? _result;

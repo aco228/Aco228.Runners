@@ -1,10 +1,10 @@
 ﻿namespace Aco228.Runners.Core.Actions;
 
-public class ActionResponseStateIntercept<TRequest, TResponse> : ActionResponseBase<TRequest, TResponse>
+public class ActionResultStateIntercept<TRequest, TResponse> : ActionResultBase<TRequest, TResponse>
 {
     private readonly ActionStateManager _actionStateManager;
 
-    public ActionResponseStateIntercept(ActionStateManager actionStateManager)
+    public ActionResultStateIntercept(ActionStateManager actionStateManager)
     {
         _actionStateManager = actionStateManager;
     }
