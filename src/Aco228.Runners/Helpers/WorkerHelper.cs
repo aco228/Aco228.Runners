@@ -3,7 +3,7 @@ using Aco228.Runners.Core.Worker;
 
 namespace Aco228.Runners.Helpers;
 
-public static class Workers
+public static class WorkerHelper
 {
     public static T Get<T>()
         where T : IUnitOfWork
