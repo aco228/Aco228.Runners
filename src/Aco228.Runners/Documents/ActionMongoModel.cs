@@ -29,6 +29,8 @@ public class ActionMongoModel<T> : IActionMongoModel
         Id = id;
     }
     
+    public ActionMongoModel(string id) : this(ObjectId.Parse(id)) { }
+    
     public ActionMongoModel(T document) : this(document.Id)
     {
         Id = document.Id;
