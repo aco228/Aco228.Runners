@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Aco228.Common;
+using Aco228.MongoDb.Extensions;
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Models;
 using Aco228.MongoDb.Services;
@@ -45,7 +46,7 @@ public class ActionMongoModel<T> : IActionMongoModel
         if (Document != null)
             return Document;
         
-        Document = ServiceProviderHelper.GetService<IMongoRepo<T>>()!.FindById(Id.Value);
+        Document = ServiceProviderHelper.GetService<IMongoRepo<T>>()!.NoTrack().FindById(Id.Value);
         return Document;
     }
 
@@ -57,7 +58,7 @@ public class ActionMongoModel<T> : IActionMongoModel
         if (Document != null)
             return Document;
         
-        Document = await ServiceProviderHelper.GetService<IMongoRepo<T>>()!.FindByIdAsync(Id.Value);
+        Document = await ServiceProviderHelper.GetService<IMongoRepo<T>>()!.NoTrack().FindByIdAsync(Id.Value);
         return Document;
     }
 
