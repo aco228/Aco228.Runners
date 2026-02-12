@@ -32,6 +32,8 @@ public abstract class TaskBase : ITask
     public Task ExecuteTask(bool forceExecute = false)
         => ExecuteTask(Name, CancellationToken.None, forceExecute);
     
+    protected virtual async Task PrepareResources() => await Task.CompletedTask;
+    
     internal async Task ExecuteTask(string name, CancellationToken cancellationToken, bool forceExecute = false, bool? runAsync = null)
     {
         Name = name;
@@ -46,11 +48,17 @@ public abstract class TaskBase : ITask
         {
             IsRunning = true;
             var runAsyncValue = runAsync ?? RunSync;
+            
+            await PrepareResources();
 
             if (runAsyncValue)
+            {
                 await InternalExecute();
+            }
             else
+            {
                 await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
+            }
 
         }
         catch (Exception ex)
