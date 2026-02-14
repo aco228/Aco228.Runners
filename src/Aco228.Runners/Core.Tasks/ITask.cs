@@ -12,6 +12,7 @@ public interface ITask
 public abstract class TaskBase : ITask
 {
     internal string Name { get; set; }
+    public virtual string? Description { get; } = null;
     public virtual HourWindow From { get; } = HourWindow.DayStart;
     public virtual HourWindow To { get; } = HourWindow.DayEnd;
     public virtual DelayWindow Delay { get; } = new(1, DelayType.Hours);
