@@ -5,6 +5,13 @@ namespace Aco228.Runners.Helpers;
 
 public static class WorkerHelper
 {
+    public static T Get<T>(params object[] args)
+        where T : IUnitOfWork
+    {
+        var worker = ServiceProviderHelper.Construct<T>(args);
+        return worker;
+    } 
+    
     public static T Get<T>()
         where T : IUnitOfWork
     {
