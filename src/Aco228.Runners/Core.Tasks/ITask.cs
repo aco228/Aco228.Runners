@@ -24,6 +24,7 @@ public abstract class TaskBase : ITask
     internal DateTime StartTime { get; set; }
     internal bool IsRunning { get; set; } = false;
     internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
+    protected CancellationToken CancellationToken { get; set; }
     public DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc;
 
     protected abstract Task InternalExecute();
@@ -39,6 +40,7 @@ public abstract class TaskBase : ITask
     {
         Name = name;
         StartTime = DateTime.Now;
+        CancellationToken = cancellationToken;
 
         if (CanRun() && (!forceExecute && !this.IsTimeOkay()) || IsRunning)
         {
