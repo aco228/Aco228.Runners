@@ -6,12 +6,13 @@ namespace Aco228.Runners.Core.Tasks;
 
 public interface ITask
 {
+    string Name { get; set; }
     Task ExecuteTask(bool forceExecute = false);
 }
 
 public abstract class TaskBase : ITask
 {
-    internal string Name { get; set; }
+    public string Name { get; set; }
     public virtual string? Description { get; } = null;
     public virtual HourWindow From { get; } = HourWindow.DayStart;
     public virtual HourWindow To { get; } = HourWindow.DayEnd;
@@ -82,6 +83,6 @@ public abstract class TaskBase : ITask
     
     public virtual void ConsoleLog(string message)
     {
-        TaskConsoleHelper.Log(message);
+        TaskConsoleHelper.Log($"{Name} | {message}");
     }
 }

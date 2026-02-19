@@ -9,6 +9,7 @@ public static class TaskHelper
         where T : ITask
     {
         var task = ServiceProviderHelper.Construct<T>();
+        task.Name = typeof(T).Name;
         return task;
     }
     
