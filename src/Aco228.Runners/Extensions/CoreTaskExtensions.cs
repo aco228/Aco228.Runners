@@ -38,6 +38,8 @@ public static class CoreTaskExtensions
                 difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalHours;
             if (task.Delay.Type == DelayType.Minutes)
                 difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalMinutes;
+            if (task.Delay.Type == DelayType.Seconds)
+                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalSeconds;
             
             if (difference < task.Delay.Value)
                 return false;
