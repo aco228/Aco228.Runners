@@ -1,4 +1,5 @@
-﻿using Aco228.Runners.Extensions;
+﻿using Aco228.Runners.Documents;
+using Aco228.Runners.Extensions;
 using Aco228.Runners.Helpers.Tasks;
 using Aco228.Runners.Models.Timings;
 
@@ -18,7 +19,9 @@ public abstract class TaskBase : ITask
     public virtual HourWindow To { get; } = HourWindow.DayEnd;
     public virtual DelayWindow Delay { get; } = new(1, DelayType.Hours);
     public virtual List<DayOfWeek>? OnlyOnDays { get;  } = null;
-    public virtual string? Category { get; } = null; 
+    public virtual string? Category { get; } = null;
+    internal TaskDocument? Document { get; set; }
+    public EventHandler OnCompleted;
     
     internal ITaskDefinition? TaskDefinition { get; set; } 
     internal virtual bool RunSync { get; } = false;
@@ -45,11 +48,13 @@ public abstract class TaskBase : ITask
 
         if (CanRun() && (!forceExecute && !this.IsTimeOkay()) || IsRunning)
         {
+            OnCompleted.Invoke(this, EventArgs.Empty);
             return;
         }
 
         try
         {
+            Document?.LastExecutionUtc = DateTime.UtcNow;
             IsRunning = true;
             var runAsyncValue = runAsync ?? RunSync;
             
@@ -63,7 +68,8 @@ public abstract class TaskBase : ITask
             {
                 await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
             }
-
+            
+            Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
         }
         catch (Exception ex)
         {
@@ -76,9 +82,12 @@ public abstract class TaskBase : ITask
             ConsoleLog("");
             ConsoleLog("");
         }
+        
+        Document?.LastExecutionUtc = DateTime.UtcNow;
 
         await OnFinish();
         TaskDefinition?.Update();
+        OnCompleted.Invoke(this, EventArgs.Empty);
     }
     
     public virtual void ConsoleLog(string message)

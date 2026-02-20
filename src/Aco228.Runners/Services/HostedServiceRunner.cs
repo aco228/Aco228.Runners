@@ -6,7 +6,7 @@ namespace Aco228.Runners.Services;
 
 public static class HostedServiceRunner
 {
-    public static async Task RunAsync(ServiceProvider provider)
+    public static async Task RunAsync(IServiceProvider provider)
     {
         var hostedServices = provider.GetServices<IHostedService>().ToList();
 
@@ -84,8 +84,6 @@ public static class HostedServiceRunner
 
         if (provider is IAsyncDisposable asyncDisposable)
             await asyncDisposable.DisposeAsync();
-        else
-            provider.Dispose();
 
         Console.WriteLine("Shutdown complete.");
     }

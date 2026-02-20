@@ -1,6 +1,7 @@
 ﻿using Aco228.Common;
 using Aco228.MongoDb.Extensions.MongoDocuments;
-using Aco228.Runners.Core.Tasks.Documents;
+using Aco228.Runners.Documents;
+
 
 namespace Aco228.Runners.Core.Tasks;
 
@@ -10,7 +11,7 @@ public interface ITaskDefinition
     Type Type { get; }
     string Name { get; }
     DateTime? LastExecutionInUtc { get; }
-    Task Update();
+    Task Update(TaskDocument? document = null);
 }
 
 public class TaskDefinition : ITaskDefinition
@@ -26,11 +27,21 @@ public class TaskDefinition : ITaskDefinition
         Type = type;
         var instance = Activator.CreateInstance(type) as TaskBase;
         Categories = instance!.Category;
-
     }
 
-    public async Task Update()
+    public TaskBase Initialize()
     {
+        var task =  ServiceProviderHelper.ConstructByType(Type) as TaskBase;
+        task.Document = Document;
+        task.Name = Name;
+        task.TaskDefinition = this;
+        return task;
+    }
+
+    public async Task Update(TaskDocument? document = null)
+    {
+        if(document != null) Document = document;
+        
         Document.LastExecutionUtc = DateTime.UtcNow;
         await Document.InsertOrUpdateAsync();
     }

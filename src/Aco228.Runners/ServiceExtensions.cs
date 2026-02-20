@@ -1,41 +1,49 @@
-﻿using System.Reflection;
-using Aco228.Common.Extensions;
+﻿using Aco228.Common.Extensions;
 using Aco228.Common.Models;
 using Aco228.MongoDb.Helpers;
 using Aco228.MongoDb.Services;
-using Aco228.Runners.Models;
+using Aco228.Runners.Core;
+using Aco228.Runners.Core.Tasks;
+using Aco228.Runners.Services;
+using Aco228.Runners.Services.Background;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Aco228.Runners;
 
+internal static class TaskCollection
+{
+    public static List<Type> Tasks { get; set; } = new();
+}
+
 public static class ServiceExtensions
 {
-    public static void ConfigureRunActionAssembly(this IServiceCollection services, Assembly assembly)
+    public static void RegisterRunnersRepositories<T>(this IServiceCollection services) where T : IMongoDbContext
     {
-        // ActionAssembliesData.Assemblies.Add(assembly);
+        services.RegisterRepositoriesFromAssembly<T>(typeof(ServiceExtensions).Assembly);
     }
     
-    public static void ConfigureRunActionServices<TDbContext>(this IServiceCollection services)
-        where TDbContext : IMongoDbContext
+    public static void RegisterTask<T>(this IServiceCollection services) where T : TaskBase
     {
-        // services.ConfigureRunActionAssembly( typeof(TDbContext).Assembly);
-        // services.RegisterServicesFromAssembly(typeof(ServiceExtensions).Assembly);
-        // services.RegisterRepositoriesFromAssembly<TDbContext>(typeof(ServiceExtensions).Assembly);
-        // services.RegisterPostBuildAction((pr) =>
-        // {
-        //     Helpers.Actions.ActionDocumentRepo = pr.GetService<IMongoRepo<ActionRunDocument>>()!;
-        //     Helpers.Actions.ActionCompletedRepo = pr.GetService<IMongoRepo<ActionCompletedDocument>>()!;
-        // });
+        TaskCollection.Tasks.Add(typeof(T));
     }
 
-    public static void ConfigureRunActionBackgroundServices(this IServiceCollection services, HostMachineContract machineContract)
+    public static void RegisterTaskManager(this IServiceCollection services)
     {
-        // services.AddSingleton<IHostMachineService>(new HostMachineService(machineContract));
-        // services.AddHostedService<ActionBackgroundService>();
-        // services.AddHostedService<HeartbeatBackgroundService>();
-        // services.RegisterPostBuildActionAsync(async (pr) =>
-        // {
-        //     await pr.GetService<IHostMachineService>()!.Initialize();
-        // });
+        services.RegisterBackgroundServices<TaskManagerService>();
+    }
+
+    public static void RegisterBackgroundServices<T>(this IServiceCollection services) where T : HostServiceBase
+    {
+        services.AddHostedService<T>();
+    }
+
+    public static void ConfigureRunBackgroundServices(this IServiceCollection services, HostMachineContract machineContract)
+    {
+        services.AddSingleton<IHostMachineService>(new HostMachineService(machineContract));
+        services.AddHostedService<HeartbeatBackgroundService>();
+        services.RegisterPostBuildActionAsync(async (pr) =>
+        {
+            await pr.GetService<IHostMachineService>()!.Initialize();
+        });
     }
 }
