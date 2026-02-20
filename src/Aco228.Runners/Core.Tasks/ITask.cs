@@ -14,6 +14,7 @@ public interface ITask
 public abstract class TaskBase : ITask
 {
     public string Name { get; set; }
+    public virtual int RunCandidatesInParallelCount { get; set; } = 1;
     public virtual string? Description { get; } = null;
     public virtual HourWindow From { get; } = HourWindow.DayStart;
     public virtual HourWindow To { get; } = HourWindow.DayEnd;
@@ -22,7 +23,7 @@ public abstract class TaskBase : ITask
     public virtual string? Category { get; } = null;
     internal TaskDocument? Document { get; set; }
     protected TaskStateMachine StateMachine { get; set; } = new();
-    public EventHandler OnCompleted;
+    public EventHandler? OnCompleted;
     
     internal ITaskDefinition? TaskDefinition { get; set; } 
     internal virtual bool RunSync { get; } = false;
@@ -46,7 +47,7 @@ public abstract class TaskBase : ITask
         Name = name;
         StartTime = DateTime.Now;
         CancellationToken = cancellationToken;
-
+        
         if (CanRun() && (!forceExecute && !this.IsTimeOkay()) || IsRunning)
         {
             OnCompleted.Invoke(this, EventArgs.Empty);
@@ -89,7 +90,7 @@ public abstract class TaskBase : ITask
 
         await OnFinish();
         TaskDefinition?.Update();
-        OnCompleted.Invoke(this, EventArgs.Empty);
+        OnCompleted?.Invoke(this, EventArgs.Empty);
     }
     
     public virtual void ConsoleLog(string message)

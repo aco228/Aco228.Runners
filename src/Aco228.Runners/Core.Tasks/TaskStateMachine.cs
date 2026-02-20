@@ -8,6 +8,7 @@ public class TaskStateMachine
     private readonly List<Task> _tasks = new();
     private bool _running = false;
     private readonly object _lock = new();
+    private Task? _loopTask;
 
     public Action<Exception, object?>? OnError { get; set; }
 
@@ -33,14 +34,14 @@ public class TaskStateMachine
         _queue.Enqueue((func, entry));
         TryStart();
     }
-
+    
     private void TryStart()
     {
         lock (_lock)
         {
             if (_running) return;
             _running = true;
-            _ = RunLoop();
+            _loopTask = RunLoop();
         }
     }
 
@@ -81,5 +82,11 @@ public class TaskStateMachine
         }
     }
 
-    public Task Wait() => Task.WhenAll(_tasks);
+    public async Task Wait()
+    {
+        if (_loopTask != null)
+            await _loopTask;
+        
+        await Task.WhenAll(_tasks);
+    }
 }

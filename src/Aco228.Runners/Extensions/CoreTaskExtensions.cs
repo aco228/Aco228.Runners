@@ -15,6 +15,12 @@ public static class CoreTaskExtensions
         await task.ExecuteTask(name, cancellationToken.Value, forceExecute);
         task.ConsoleLog($" [ENGINE]: Finished {name}");
     }
+
+    public static T SetParallelCount<T>(this T task, int count) where T : TaskBase
+    {
+        task.RunCandidatesInParallelCount = count;
+        return task;
+    }
     
     public static bool IsTimeOkay(this TaskBase task)
     {
