@@ -21,6 +21,7 @@ public abstract class TaskBase : ITask
     public virtual List<DayOfWeek>? OnlyOnDays { get;  } = null;
     public virtual string? Category { get; } = null;
     internal TaskDocument? Document { get; set; }
+    protected TaskStateMachine StateMachine { get; set; } = new();
     public EventHandler OnCompleted;
     
     internal ITaskDefinition? TaskDefinition { get; set; } 
@@ -69,6 +70,7 @@ public abstract class TaskBase : ITask
                 await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
             }
             
+            await StateMachine.Wait();
             Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
         }
         catch (Exception ex)

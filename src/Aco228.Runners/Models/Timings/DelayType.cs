@@ -3,15 +3,18 @@
 public enum DelayType
 {
     None = -1,
-    Minutes = 1,
-    Hours = 2,
-    Days = 3,
+    Seconds = 1,
+    Minutes = 2,
+    Hours = 3,
+    Days = 4,
 }
 
 public static class DelayTypeExtension
 {
     public static DateTime CreateUTCDelayFrom(this DelayType type, int delayValue)
     {
+        if (type == DelayType.Seconds)
+            return DateTime.UtcNow.AddSeconds(delayValue);
         if (type == DelayType.Minutes)
             return DateTime.UtcNow.AddMinutes(delayValue);
         if (type == DelayType.Hours)
