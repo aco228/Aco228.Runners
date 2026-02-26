@@ -41,6 +41,12 @@ public abstract class TaskBase : ITask
         => ExecuteTask(Name, CancellationToken.None, forceExecute);
     
     protected virtual async Task PrepareResources() => await Task.CompletedTask;
+
+    internal async Task<bool> Prepare()
+    {
+        await PrepareResources();
+        return CanRun();
+    }
     
     internal async Task ExecuteTask(string name, CancellationToken cancellationToken, bool forceExecute = false, bool? runAsync = null)
     {

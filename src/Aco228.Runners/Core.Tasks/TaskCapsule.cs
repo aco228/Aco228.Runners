@@ -1,5 +1,7 @@
-﻿using Aco228.Runners.Extensions;
+﻿using System.Reflection.Metadata;
+using Aco228.Runners.Extensions;
 using Aco228.Runners.Services.Background;
+using MongoDB.Bson;
 
 namespace Aco228.Runners.Core.Tasks;
 
@@ -19,7 +21,7 @@ internal class TaskCapsule
         TaskDefinition = taskDefinition;
     }
 
-    public bool TryStart(bool forceExecute)
+    public async Task<bool> TryStart(bool forceExecute)
     {
         Task = TaskDefinition.Initialize();
         Task.OnCompleted += (sender, args) =>
@@ -32,6 +34,13 @@ internal class TaskCapsule
         
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
         StartTime = DateTime.Now;
+
+        var prepare = await Task.Prepare();
+        if (prepare == false)
+        {
+            return false;
+        }
+        
         Execution = Task.ExecuteTask(TaskDefinition.Name, _manager.CancellationToken, forceExecute)
             .WaitAsync(_manager.CancellationToken);
 

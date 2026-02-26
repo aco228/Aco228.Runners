@@ -10,6 +10,7 @@ public interface ITaskDefinition
     string? Categories { get; }
     Type Type { get; }
     string Name { get; }
+    TaskDocument Document { get;}
     DateTime? LastExecutionInUtc { get; }
     Task Update(TaskDocument? document = null);
 }
@@ -19,7 +20,7 @@ public class TaskDefinition : ITaskDefinition
     public string? Categories { get; set; }
     public Type Type { get; set; }
     public string Name => Type.Name;
-    internal TaskDocument Document { get; set; }
+    public TaskDocument Document { get; internal set; }
     public DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
     
     public TaskDefinition(Type type)

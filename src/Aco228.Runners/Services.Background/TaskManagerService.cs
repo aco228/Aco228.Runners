@@ -11,7 +11,7 @@ namespace Aco228.Runners.Services.Background;
 
 public class TaskManagerService : HostServiceBase
 {
-    private const int MAXIMUM_PER_TURN = 2;
+    private const int MAXIMUM_PER_TURN = 4;
     
     protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
     
@@ -44,7 +44,7 @@ public class TaskManagerService : HostServiceBase
 
             taskDocument.Delay = taskDocument.Delay;
             taskDocument.From = taskDocument.From;
-            taskDocument.To = taskDocument.To;  
+            taskDocument.To = taskDocument.To;
             taskDocument.OnlyOnDays = taskDocument.OnlyOnDays;
             taskDefinition.Document = taskDocument;
             Tasks.Add(taskDefinition);
@@ -71,13 +71,14 @@ public class TaskManagerService : HostServiceBase
         if (!candidates.Any())
             return;
 
-        foreach (var candidate in candidates)
+        foreach (var candidate in candidates.OrderBy(x => x.Document.LastExecutionUtc))
         {
             if (RunningTasks.Count >= MAXIMUM_PER_TURN)
                 return;
             
             var taskCapsule = new TaskCapsule(this, candidate);
-            if (taskCapsule.TryStart(forceExecute: false))
+            var canRun = await taskCapsule.TryStart(forceExecute: false);
+            if (canRun)
             {
                 Console.WriteLine($" ++ adding task {taskCapsule.Name}");
                 RunningTasks.TryAdd(taskCapsule.Name, taskCapsule);
