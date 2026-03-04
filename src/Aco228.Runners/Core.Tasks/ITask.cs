@@ -82,6 +82,8 @@ public abstract class TaskBase : ITask
         }
         catch (Exception ex)
         {
+            CaptureError("CriticalTaskException", ex);
+            
             ConsoleLog("");
             ConsoleLog("");
             ConsoleLog("");
@@ -97,6 +99,33 @@ public abstract class TaskBase : ITask
         await OnFinish();
         TaskDefinition?.Update();
         OnCompleted?.Invoke(this, EventArgs.Empty);
+    }
+
+    protected void CaptureError(string problem, Exception? ex = null, params string[] tags)
+    {
+        void ConfigureScope(Scope scope)
+        {
+            scope.Level = SentryLevel.Error;
+            scope.SetTag("TaskName", Name);
+            scope.SetTag("TaskType", GetType().Name);
+            scope.SetExtra("problem", problem);
+        
+            for (int i = 0; i < tags.Length - 1; i += 2)
+                scope.SetTag(tags[i], tags[i + 1]);
+        }
+
+        if (ex == null)
+        {
+            SentrySdk.CaptureEvent(new SentryEvent
+            {
+                Message = new SentryMessage { Message = problem },
+                Level = SentryLevel.Error,
+            }, ConfigureScope);
+        }
+        else
+        {
+            SentrySdk.CaptureException(ex, ConfigureScope);
+        }
     }
     
     public virtual void ConsoleLog(string message)
