@@ -1,10 +1,12 @@
 ﻿using Aco228.MongoDb.Models;
 using Aco228.MongoDb.Models.Attributes;
 using Aco228.Runners.Models.Timings;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Aco228.Runners.Documents;
 
 [BsonCollection("Tasks")]
+[BsonIgnoreExtraElements]
 public class TaskDocument : MongoDocument
 {
     [MongoIndex] public required string Name { get; set; }
