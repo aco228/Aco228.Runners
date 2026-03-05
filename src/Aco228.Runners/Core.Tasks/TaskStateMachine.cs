@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
 
+namespace Aco228.Runners.Core.Tasks;
+
 public class TaskStateMachine
 {
     private int _limit = 5;
