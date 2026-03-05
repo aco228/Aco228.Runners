@@ -11,10 +11,12 @@ namespace Aco228.Runners.Services.Background;
 
 public class TaskManagerService : HostServiceBase
 {
-    private const int MAXIMUM_PER_TURN = 4;
+    private const int MAXIMUM_PER_TURN = 6;
+    public static TaskManagerService? Instance { get; private set; }
     
     protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
-    
+
+    private bool _isShutdownMode = false;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
     private readonly IHostMachineService _hostMachineService;
     private List<TaskDefinition> Tasks { get; set; } = new();
@@ -26,6 +28,7 @@ public class TaskManagerService : HostServiceBase
     {
         _taskRepo = taskRepo;
         _hostMachineService = hostMachineService;
+        Instance = this;
     }
     
     public override async Task Initialize()
@@ -58,6 +61,15 @@ public class TaskManagerService : HostServiceBase
         Console.WriteLine("Tick");
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
             return;
+
+        if (_isShutdownMode)
+        {
+            if(RunningTasks.Count > 0)
+                return;
+            
+            Environment.Exit(0);
+            return;
+        }
         
         var candidates = new List<TaskDefinition>();
         foreach (var taskDefinition in Tasks.OrderByDescending(x => x.Document.LastExecutionUtc))
@@ -84,7 +96,11 @@ public class TaskManagerService : HostServiceBase
                 RunningTasks.TryAdd(taskCapsule.Name, taskCapsule);
             }
         }
+    }
 
+    public void DemandShutdown()
+    {
+        _isShutdownMode = true;
     }
     
     internal void OnTaskFinished(TaskCapsule task)
