@@ -37,9 +37,14 @@ public static class ServiceExtensions
         services.AddHostedService<T>();
     }
 
+    public static void RegisterHostMachine(this IServiceCollection services)
+    {
+        var machineContract = HostMachineContract.CreateFromEnvironment();
+        services.AddSingleton<IHostMachineService>(new HostMachineService(machineContract));
+    }
+
     public static void ConfigureRunBackgroundServices(this IServiceCollection services, HostMachineContract machineContract)
     {
-        services.AddSingleton<IHostMachineService>(new HostMachineService(machineContract));
         services.AddHostedService<HeartbeatBackgroundService>();
         services.RegisterPostBuildActionAsync(async (pr) =>
         {
