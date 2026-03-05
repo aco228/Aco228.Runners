@@ -113,6 +113,8 @@ public abstract class TaskBase : ITask
             for (int i = 0; i < tags.Length - 1; i += 2)
                 scope.SetTag(tags[i], tags[i + 1]);
         }
+        
+        ConsoleLog($"ERROR: {problem}, " + ex);
 
         if (ex == null)
         {
