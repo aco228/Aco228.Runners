@@ -6,12 +6,13 @@ using Aco228.MongoDb.Services;
 using Aco228.Runners.Core;
 using Aco228.Runners.Core.Tasks;
 using Aco228.Runners.Documents;
+using Aco228.Runners.Extensions;
 
 namespace Aco228.Runners.Services.Background;
 
 public class TaskManagerService : HostServiceBase
 {
-    private const int MAXIMUM_PER_TURN = 6;
+    private const int MAXIMUM_PER_TURN = 10;
     public static TaskManagerService? Instance { get; private set; }
     
     protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
@@ -58,6 +59,7 @@ public class TaskManagerService : HostServiceBase
 
     protected override async Task ExecuteTick()
     {
+        Console.Clear();
         Console.WriteLine("Tick");
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
             return;
@@ -75,6 +77,9 @@ public class TaskManagerService : HostServiceBase
         foreach (var taskDefinition in Tasks.OrderByDescending(x => x.Document.LastExecutionUtc))
         {
             if (RunningTasks.Any(x => x.Value.Name == taskDefinition.Name))
+                continue;
+
+            if (!taskDefinition.IsTimeOkay())
                 continue;
             
             candidates.Add(taskDefinition);

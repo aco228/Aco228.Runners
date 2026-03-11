@@ -22,7 +22,7 @@ public static class CoreTaskExtensions
         return task;
     }
     
-    public static bool IsTimeOkay(this TaskBase task)
+    public static bool IsTimeOkay(this TaskDateDefinition task)
     {
         var currentTime = DateTime.Now;
 

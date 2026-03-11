@@ -1,6 +1,7 @@
 ﻿using Aco228.Common;
 using Aco228.MongoDb.Extensions.MongoDocuments;
 using Aco228.Runners.Documents;
+using Aco228.Runners.Models.Timings;
 
 
 namespace Aco228.Runners.Core.Tasks;
@@ -15,13 +16,17 @@ public interface ITaskDefinition
     Task Update(TaskDocument? document = null);
 }
 
-public class TaskDefinition : ITaskDefinition
+public class TaskDefinition : TaskDateDefinition, ITaskDefinition
 {
     public string? Categories { get; set; }
     public Type Type { get; set; }
     public string Name => Type.Name;
     public TaskDocument Document { get; internal set; }
-    public DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
+    public override HourWindow From => Document.From;
+    public override HourWindow To => Document.To;
+    public override DelayWindow Delay => Document.Delay;
+    public override List<DayOfWeek>? OnlyOnDays => Document.OnlyOnDays;
+    public override DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
     
     public TaskDefinition(Type type)
     {

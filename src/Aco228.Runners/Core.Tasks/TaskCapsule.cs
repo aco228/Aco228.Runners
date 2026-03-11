@@ -1,7 +1,5 @@
-﻿using System.Reflection.Metadata;
-using Aco228.Runners.Extensions;
+﻿using Aco228.Runners.Extensions;
 using Aco228.Runners.Services.Background;
-using MongoDB.Bson;
 
 namespace Aco228.Runners.Core.Tasks;
 
@@ -24,11 +22,6 @@ internal class TaskCapsule
     public async Task<bool> TryStart(bool forceExecute)
     {
         Task = TaskDefinition.Initialize();
-        Task.OnCompleted += (sender, args) =>
-        {
-            _manager.OnTaskFinished(this);
-        };
-        
         if (!Task.IsTimeOkay())
             return false;
         
@@ -41,7 +34,13 @@ internal class TaskCapsule
             return false;
         }
         
-        Execution = Task.ExecuteTask(TaskDefinition.Name, _manager.CancellationToken, forceExecute)
+        Task.OnCompleted += (sender, args) =>
+        {
+            _manager.OnTaskFinished(this);
+        };
+        
+        Execution = Task
+            .ExecuteTask(TaskDefinition.Name, _manager.CancellationToken, forceExecute)
             .WaitAsync(_manager.CancellationToken);
 
         return true;

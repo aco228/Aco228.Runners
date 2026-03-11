@@ -11,15 +11,20 @@ public interface ITask
     Task ExecuteTask(bool forceExecute = false);
 }
 
-public abstract class TaskBase : ITask
+public abstract class TaskDateDefinition
 {
-    public string Name { get; set; }
-    public virtual int RunCandidatesInParallelCount { get; set; } = 1;
-    public virtual string? Description { get; } = null;
     public virtual HourWindow From { get; } = HourWindow.DayStart;
     public virtual HourWindow To { get; } = HourWindow.DayEnd;
     public virtual DelayWindow Delay { get; } = new(1, DelayType.Hours);
     public virtual List<DayOfWeek>? OnlyOnDays { get;  } = null;
+    public abstract DateTime? LastExecutionInUtc { get; }
+}
+
+public abstract class TaskBase : TaskDateDefinition, ITask
+{
+    public string Name { get; set; }
+    public virtual int RunCandidatesInParallelCount { get; set; } = 1;
+    public virtual string? Description { get; } = null;
     public virtual string? Category { get; } = null;
     internal TaskDocument? Document { get; set; }
     protected TaskStateMachine StateMachine { get; set; } = new();
@@ -31,7 +36,7 @@ public abstract class TaskBase : ITask
     internal bool IsRunning { get; set; } = false;
     internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
     protected CancellationToken CancellationToken { get; set; }
-    public DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc;
+    public override DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc;
 
     protected abstract Task InternalExecute();
     protected virtual bool CanRun() => true;
