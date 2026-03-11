@@ -133,6 +133,8 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         {
             SentrySdk.CaptureException(ex, ConfigureScope);
         }
+        
+        _ = Task.Run(() => SentrySdk.FlushAsync(TimeSpan.FromSeconds(3)));
     }
     
     public virtual void ConsoleLog(string message)
