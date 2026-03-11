@@ -6,6 +6,18 @@ namespace Aco228.Runners.Services;
 
 public static class HostedServiceRunner
 {
+    
+    public static async Task InitializeAsync(IServiceProvider provider)
+    {
+        var hostedServices = provider.GetServices<IHostedService>().ToList();
+    
+        foreach (var service in hostedServices)
+        {
+            if (service is HostServiceBase hostServiceBase)
+                await hostServiceBase.Initialize();
+        }
+    }
+    
     public static async Task RunAsync(IServiceProvider provider)
     {
         var hostedServices = provider.GetServices<IHostedService>().ToList();
