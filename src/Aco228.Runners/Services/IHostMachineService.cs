@@ -3,7 +3,6 @@ using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Services;
 using Aco228.Runners.Documents;
-using Aco228.Runners.Models;
 
 namespace Aco228.Runners.Services;
 
