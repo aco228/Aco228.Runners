@@ -31,8 +31,13 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
     public TaskDefinition(Type type)
     {
         Type = type;
-        var instance = Activator.CreateInstance(type) as TaskBase;
+    }
+
+    public TaskBase CreateInstance()
+    {
+        var instance = Activator.CreateInstance(Type) as TaskBase;
         Categories = instance!.Category;
+        return instance;
     }
 
     public TaskBase Initialize()

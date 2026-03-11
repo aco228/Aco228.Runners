@@ -38,6 +38,7 @@ public class TaskManagerService : HostServiceBase
         foreach (var taskType in TaskCollection.Tasks)
         {
             var taskDefinition = new TaskDefinition(taskType);
+            var instance = taskDefinition.CreateInstance();
             
             var taskDocument = currentTasks.FirstOrDefault(x => x.Name == taskType.Name);
             if (taskDocument == null)
@@ -46,10 +47,10 @@ public class TaskManagerService : HostServiceBase
                 currentTasks.Add(taskDocument);
             }
 
-            taskDocument.Delay = taskDocument.Delay;
-            taskDocument.From = taskDocument.From;
-            taskDocument.To = taskDocument.To;
-            taskDocument.OnlyOnDays = taskDocument.OnlyOnDays;
+            taskDocument.Delay = instance.Delay;
+            taskDocument.From = instance.From;
+            taskDocument.To = instance.To;
+            taskDocument.OnlyOnDays = instance.OnlyOnDays;
             taskDefinition.Document = taskDocument;
             Tasks.Add(taskDefinition);
         }
