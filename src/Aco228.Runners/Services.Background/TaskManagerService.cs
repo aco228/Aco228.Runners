@@ -59,7 +59,6 @@ public class TaskManagerService : HostServiceBase
 
     protected override async Task ExecuteTick()
     {
-        Console.Clear();
         Console.WriteLine("Tick");
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
             return;
