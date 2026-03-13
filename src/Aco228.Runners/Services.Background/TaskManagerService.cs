@@ -63,7 +63,7 @@ public class TaskManagerService : HostServiceBase
     {
         if (PauseUntil != null)
         {
-            if (PauseUntil.Value < DateTime.Now)
+            if (PauseUntil.Value > DateTime.Now)
                 return;
             
             PauseUntil = null;   
