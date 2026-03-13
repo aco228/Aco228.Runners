@@ -14,7 +14,8 @@ public class TaskManagerService : HostServiceBase
 {
     private const int MAXIMUM_PER_TURN = 10;
     public static TaskManagerService? Instance { get; private set; }
-    
+
+    public DateTime? PauseUntil { get; set; } = null;
     protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
 
     private bool _isShutdownMode = false;
@@ -60,6 +61,14 @@ public class TaskManagerService : HostServiceBase
 
     protected override async Task ExecuteTick()
     {
+        if (PauseUntil != null)
+        {
+            if (PauseUntil.Value < DateTime.Now)
+                return;
+            
+            PauseUntil = null;   
+        }
+        
         Console.WriteLine("Tick");
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
             return;
