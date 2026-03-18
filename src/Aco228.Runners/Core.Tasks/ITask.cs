@@ -24,6 +24,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
 {
     public string Name { get; set; }
     public virtual int RunCandidatesInParallelCount { get; set; } = 1;
+    public virtual bool PanicOnException { get; } = true;
     public virtual string? Description { get; } = null;
     public virtual string? Category { get; } = null;
     internal TaskDocument? Document { get; set; }
@@ -87,7 +88,8 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         }
         catch (Exception ex)
         {
-            CaptureError("CriticalTaskException", ex);
+            if (PanicOnException)
+                CaptureError("CriticalTaskException", ex);
             
             ConsoleLog("");
             ConsoleLog("");
