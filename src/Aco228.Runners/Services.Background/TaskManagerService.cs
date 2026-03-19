@@ -12,7 +12,8 @@ namespace Aco228.Runners.Services.Background;
 
 public class TaskManagerService : HostServiceBase
 {
-    private const int MAXIMUM_PER_TURN = 10;
+    private static int MAXIMUM_PER_TURN = 1;
+    
     public static TaskManagerService? Instance { get; private set; }
 
     public DateTime? PauseUntil { get; set; } = null;
@@ -35,6 +36,10 @@ public class TaskManagerService : HostServiceBase
     
     public override async Task Initialize()
     {
+        #if DEBUG
+        MAXIMUM_PER_TURN = 1;
+        #endif
+        
         var currentTasks = await _taskRepo.Track().Full().ToListAsync();
         foreach (var taskType in TaskCollection.Tasks)
         {

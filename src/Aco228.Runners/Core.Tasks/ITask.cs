@@ -64,20 +64,19 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         StartTime = DateTime.Now;
         CancellationToken = cancellationToken;
 
-        
-
         try
         {
-            Document?.LastExecutionUtc = DateTime.UtcNow;
             var runAsyncValue = runAsync ?? RunSync;
             
             var canRun = await Prepare();
-            if (!canRun || (!forceExecute && !this.IsTimeOkay()))
+            var isTimeOk = this.IsTimeOkay();
+            if (!forceExecute && (!canRun || !isTimeOk))
             {
                 OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
             }
-
+            
+            Document?.LastExecutionUtc = DateTime.UtcNow;
             if (runAsyncValue)
             {
                 await InternalExecute();
