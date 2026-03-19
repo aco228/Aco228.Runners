@@ -28,21 +28,30 @@ internal class TaskCapsule
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
         StartTime = DateTime.Now;
 
-        var isReady = await Task.Prepare();
-        if (isReady == false)
+        try
         {
+            var isReady = await Task.Prepare();
+            if (isReady == false)
+            {
+                return false;
+            }
+
+            Task.OnCompleted += (sender, args) => { _manager.OnTaskFinished(this); };
+
+            Execution = Task
+                .ExecuteTask(TaskDefinition.Name, _manager.CancellationToken, forceExecute)
+                .WaitAsync(_manager.CancellationToken);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            SentrySdk.CaptureException(ex, scope =>
+            {
+                scope.Level = SentryLevel.Error;
+                scope.SetTag("Location", "TaskCapsule");
+            });
             return false;
         }
-        
-        Task.OnCompleted += (sender, args) =>
-        {
-            _manager.OnTaskFinished(this);
-        };
-        
-        Execution = Task
-            .ExecuteTask(TaskDefinition.Name, _manager.CancellationToken, forceExecute)
-            .WaitAsync(_manager.CancellationToken);
-
-        return true;
     }
 }
