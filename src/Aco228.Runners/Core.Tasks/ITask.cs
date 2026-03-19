@@ -74,7 +74,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             var canRun = await Prepare();
             if (!canRun || (!forceExecute && !this.IsTimeOkay()))
             {
-                OnCompleted.Invoke(this, EventArgs.Empty);
+                OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
