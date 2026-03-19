@@ -12,7 +12,7 @@ namespace Aco228.Runners.Services.Background;
 
 public class TaskManagerService : HostServiceBase
 {
-    private static int MAXIMUM_PER_TURN = 1;
+    private static int MAXIMUM_PER_TURN = 11;
     
     public static TaskManagerService? Instance { get; private set; }
 
