@@ -28,8 +28,8 @@ internal class TaskCapsule
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
         StartTime = DateTime.Now;
 
-        var prepare = await Task.Prepare();
-        if (prepare == false)
+        var isReady = await Task.Prepare();
+        if (isReady == false)
         {
             return false;
         }

@@ -33,8 +33,8 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     
     internal ITaskDefinition? TaskDefinition { get; set; } 
     internal virtual bool RunSync { get; } = false;
+    internal bool IsPrepared { get; private set; } = false;
     internal DateTime StartTime { get; set; }
-    internal bool IsRunning { get; set; } = false;
     internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
     protected CancellationToken CancellationToken { get; set; }
     public override DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc;
@@ -50,7 +50,11 @@ public abstract class TaskBase : TaskDateDefinition, ITask
 
     internal async Task<bool> Prepare()
     {
+        if(IsPrepared)
+            return true;
+        
         await PrepareResources();
+        IsPrepared = true;
         return CanRun();
     }
     
@@ -59,20 +63,20 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         Name = name;
         StartTime = DateTime.Now;
         CancellationToken = cancellationToken;
+
         
-        if (CanRun() && (!forceExecute && !this.IsTimeOkay()) || IsRunning)
-        {
-            OnCompleted.Invoke(this, EventArgs.Empty);
-            return;
-        }
 
         try
         {
             Document?.LastExecutionUtc = DateTime.UtcNow;
-            IsRunning = true;
             var runAsyncValue = runAsync ?? RunSync;
             
-            await PrepareResources();
+            var canRun = await Prepare();
+            if (!canRun || (!forceExecute && !this.IsTimeOkay()))
+            {
+                OnCompleted.Invoke(this, EventArgs.Empty);
+                return;
+            }
 
             if (runAsyncValue)
             {
@@ -82,7 +86,8 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             {
                 await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
             }
-            
+
+            IsPrepared = false;
             await StateMachine.Wait();
             Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
         }
