@@ -83,7 +83,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             }
             else
             {
-                await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
+                await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);  
             }
 
             IsPrepared = false;
