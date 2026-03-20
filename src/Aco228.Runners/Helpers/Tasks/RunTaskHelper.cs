@@ -3,7 +3,7 @@ using Aco228.Runners.Core.Tasks;
 
 namespace Aco228.Runners.Helpers.Tasks;
 
-public static class TaskHelper
+public static class RunTaskHelper
 {
     public static T Get<T>()
         where T : ITask
