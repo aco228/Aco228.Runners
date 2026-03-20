@@ -33,6 +33,7 @@ internal class TaskCapsule
             var isReady = await Task.Prepare();
             if (isReady == false)
             {
+                Task.Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
                 return false;
             }
 
