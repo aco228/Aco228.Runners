@@ -1,6 +1,7 @@
 ﻿using Aco228.Runners.Documents;
 using Aco228.Runners.Extensions;
 using Aco228.Runners.Helpers.Tasks;
+using Aco228.Runners.Models.Actions.Exceptions;
 using Aco228.Runners.Models.Timings;
 
 namespace Aco228.Runners.Core.Tasks;
@@ -67,14 +68,14 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         try
         {
             var runAsyncValue = runAsync ?? RunSync;
-            
+
             var isTimeOk = this.IsTimeOkay();
             if (!forceExecute && !isTimeOk)
             {
                 OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
             }
-            
+
             var canRun = await Prepare(force: false);
             IsPrepared = false;
             if (!forceExecute && !canRun)
@@ -83,6 +84,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
                 return;
             }
             
+            Document?.IgnoreUntilUtc = null;
             Document?.LastExecutionUtc = DateTime.UtcNow;
             if (runAsyncValue)
             {
@@ -90,11 +92,17 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             }
             else
             {
-                await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);  
+                await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);
             }
 
             await StateMachine.Wait();
-            Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
+            Document?.LastExecutionUtc = DateTime.UtcNow;
+        }
+        catch (ActionContinueException ex)
+        {
+            Document?.IgnoreUntilUtc = DateTime.UtcNow.AddMinutes(15);
+            Document?.LastExecutionUtc = DateTime.UtcNow.AddMinutes(-15);
+            
         }
         catch (Exception ex)
         {
@@ -111,8 +119,6 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             ConsoleLog("");
         }
         
-        Document?.LastExecutionUtc = DateTime.UtcNow;
-
         await OnFinish();
         TaskDefinition?.Update();
         OnCompleted?.Invoke(this, EventArgs.Empty);

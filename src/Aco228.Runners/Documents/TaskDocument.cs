@@ -15,5 +15,5 @@ public class TaskDocument : MongoDocument
     public DelayWindow Delay { get; set; }
     public List<DayOfWeek>? OnlyOnDays { get; set; }
     public DateTime? LastExecutionUtc { get; set; }
-    public DateTime? LastCompleteExecutionUtc { get; set; }
+    public DateTime? IgnoreUntilUtc { get; set; }
 }
