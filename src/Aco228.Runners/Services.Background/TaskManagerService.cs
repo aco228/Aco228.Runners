@@ -129,6 +129,7 @@ public class TaskManagerService : HostServiceBase
 
     public void DemandShutdown()
     {
+        Console.WriteLine("[[- TASK MANAGER RECEIVED RESTART");
         _isShutdownMode = true;
     }
     
