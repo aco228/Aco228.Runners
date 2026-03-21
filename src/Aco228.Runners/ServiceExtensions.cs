@@ -27,6 +27,11 @@ public static class ServiceExtensions
         TaskCollection.Tasks.Add(typeof(T));
     }
 
+    public static void ClearBackgroundTasks(this IServiceCollection services)
+    {
+        TaskCollection.Tasks.Clear();
+    }
+
     public static void RegisterTaskManager(this IServiceCollection services)
     {
         services.RegisterBackgroundServices<TaskManagerService>();

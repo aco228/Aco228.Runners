@@ -73,6 +73,9 @@ public class TaskManagerService : HostServiceBase
             
             PauseUntil = null;   
         }
+
+        foreach (var (_, taskCapsule) in RunningTasks)
+            await taskCapsule.Validate();
         
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
         {

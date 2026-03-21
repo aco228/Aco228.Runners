@@ -12,6 +12,7 @@ public class TaskCapsule
     public TaskDefinition TaskDefinition { get; private set; }
     public Task Execution { get; private set; }
     public TimeSpan MaximumAllowedExecution { get; private set; }
+    public CancellationTokenSource CancellationToken { get; set; } = new();
     
     public TaskCapsule(TaskManagerService manager, TaskDefinition taskDefinition)
     {
@@ -26,7 +27,6 @@ public class TaskCapsule
             return false;
         
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
-        StartTime = DateTime.Now;
 
         try
         {
@@ -38,11 +38,12 @@ public class TaskCapsule
                 return false;
             }
 
+            StartTime = DateTime.Now;
             Task.OnCompleted += (sender, args) => { _manager.OnTaskFinished(this); };
 
             Execution = Task
-                .ExecuteTask(TaskDefinition.Name, _manager.CancellationToken, forceExecute)
-                .WaitAsync(_manager.CancellationToken);
+                .ExecuteTask(TaskDefinition.Name, CancellationToken.Token, forceExecute)
+                .WaitAsync(CancellationToken.Token);
 
             return true;
         }
@@ -54,6 +55,21 @@ public class TaskCapsule
                 scope.SetTag("Location", "TaskCapsule");
             });
             return false;
+        }
+    }
+
+    public async Task Validate()
+    {
+        if (Execution.IsCompleted)
+        {
+            _manager.OnTaskFinished(this);
+            return;
+        }
+
+        if (DateTime.Now - StartTime > MaximumAllowedExecution)
+        {
+            await Task.OnFinish();
+            await CancellationToken.CancelAsync();
         }
     }
 }

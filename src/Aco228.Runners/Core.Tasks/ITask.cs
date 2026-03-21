@@ -41,7 +41,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
 
     protected abstract Task InternalExecute();
     protected virtual bool CanRun() => true;
-    protected virtual Task OnFinish() => Task.FromResult(true);
+    internal virtual Task OnFinish() => Task.FromResult(true);
     
     public Task ExecuteTask(bool forceExecute = false)
         => ExecuteTask(Name, CancellationToken.None, forceExecute);
@@ -69,7 +69,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             var runAsyncValue = runAsync ?? RunSync;
             
             var isTimeOk = this.IsTimeOkay();
-            if (!forceExecute && isTimeOk)
+            if (!forceExecute && !isTimeOk)
             {
                 OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
