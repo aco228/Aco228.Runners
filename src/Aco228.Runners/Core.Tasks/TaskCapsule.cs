@@ -26,10 +26,6 @@ public class TaskCapsule
         if (!Task.IsTimeOkay())
             return false;
 
-        if (Task.Document?.IgnoreUntilUtc != null && DateTime.UtcNow < Task.Document.IgnoreUntilUtc.Value)
-            return false;
-
-        Task.Document?.IgnoreUntilUtc = null;
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
 
         try

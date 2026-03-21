@@ -72,6 +72,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
             var isTimeOk = this.IsTimeOkay();
             if (!forceExecute && !isTimeOk)
             {
+                Document?.LastExecutionUtc = DateTime.UtcNow;
                 OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
             }
@@ -84,7 +85,6 @@ public abstract class TaskBase : TaskDateDefinition, ITask
                 return;
             }
             
-            Document?.IgnoreUntilUtc = null;
             Document?.LastExecutionUtc = DateTime.UtcNow;
             if (runAsyncValue)
             {
@@ -100,7 +100,6 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         }
         catch (ActionContinueException ex)
         {
-            Document?.IgnoreUntilUtc = DateTime.UtcNow.AddMinutes(15);
             Document?.LastExecutionUtc = DateTime.UtcNow.AddMinutes(-15);
             
         }
@@ -120,6 +119,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         }
         
         await OnFinish();
+        Document?.LastExecutionUtc = DateTime.UtcNow;
         TaskDefinition?.Update();
         OnCompleted?.Invoke(this, EventArgs.Empty);
     }
