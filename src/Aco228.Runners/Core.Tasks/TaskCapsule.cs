@@ -3,7 +3,7 @@ using Aco228.Runners.Services.Background;
 
 namespace Aco228.Runners.Core.Tasks;
 
-internal class TaskCapsule
+public class TaskCapsule
 {
     private readonly TaskManagerService _manager;
     public string Name => TaskDefinition.Name;
@@ -30,10 +30,11 @@ internal class TaskCapsule
 
         try
         {
-            var isReady = await Task.Prepare();
+            var isReady = await Task.Prepare(force: true);
             if (isReady == false)
             {
                 Task.Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
+                Task.IsPrepared = false;
                 return false;
             }
 

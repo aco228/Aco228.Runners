@@ -23,7 +23,7 @@ public class TaskManagerService : HostServiceBase
     private readonly IMongoRepo<TaskDocument> _taskRepo;
     private readonly IHostMachineService _hostMachineService;
     private List<TaskDefinition> Tasks { get; set; } = new();
-    internal ConcurrentDictionary<string, TaskCapsule> RunningTasks { get; private set; } = new();
+    public ConcurrentDictionary<string, TaskCapsule> RunningTasks { get; private set; } = new();
     
     public TaskManagerService(
         IMongoRepo<TaskDocument> taskRepo,
@@ -74,9 +74,11 @@ public class TaskManagerService : HostServiceBase
             PauseUntil = null;   
         }
         
-        Console.WriteLine("Tick");
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
-            return;
+        {
+            Console.WriteLine("Tick (max)"); 
+            return;   
+        }
 
         if (_isShutdownMode)
         {
@@ -100,12 +102,18 @@ public class TaskManagerService : HostServiceBase
         }
 
         if (!candidates.Any())
+        {
+            Console.WriteLine("Tick (no_can)");
             return;
+        }
 
         foreach (var candidate in candidates.OrderBy(x => x.Document.LastExecutionUtc))
         {
             if (RunningTasks.Count >= MAXIMUM_PER_TURN)
+            {
+                Console.WriteLine("Tick (can_max)");
                 return;
+            }
             
             var taskCapsule = new TaskCapsule(this, candidate);
             var canRun = await taskCapsule.TryStart(forceExecute: false);
@@ -115,6 +123,8 @@ public class TaskManagerService : HostServiceBase
                 RunningTasks.TryAdd(taskCapsule.Name, taskCapsule);
             }
         }
+        
+        Console.WriteLine("Tick (exe)");
     }
 
     public void DemandShutdown()

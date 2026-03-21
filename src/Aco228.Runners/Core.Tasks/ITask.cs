@@ -33,7 +33,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     
     internal ITaskDefinition? TaskDefinition { get; set; } 
     internal virtual bool RunSync { get; } = false;
-    internal bool IsPrepared { get; private set; } = false;
+    internal bool IsPrepared { get; set; } = false;
     internal DateTime StartTime { get; set; }
     internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
     protected CancellationToken CancellationToken { get; set; }
@@ -48,9 +48,9 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     
     protected virtual async Task PrepareResources() => await Task.CompletedTask;
 
-    internal async Task<bool> Prepare()
+    internal async Task<bool> Prepare(bool force)
     {
-        if(IsPrepared)
+        if(!force && IsPrepared)
             return true;
         
         await PrepareResources();
@@ -68,9 +68,16 @@ public abstract class TaskBase : TaskDateDefinition, ITask
         {
             var runAsyncValue = runAsync ?? RunSync;
             
-            var canRun = await Prepare();
             var isTimeOk = this.IsTimeOkay();
-            if (!forceExecute && (!canRun || !isTimeOk))
+            if (!forceExecute && isTimeOk)
+            {
+                OnCompleted?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+            
+            var canRun = await Prepare(force: false);
+            IsPrepared = false;
+            if (!forceExecute && !canRun)
             {
                 OnCompleted?.Invoke(this, EventArgs.Empty);
                 return;
@@ -86,7 +93,6 @@ public abstract class TaskBase : TaskDateDefinition, ITask
                 await InternalExecute().WaitAsync(MaximumExecutionAllowed, cancellationToken);  
             }
 
-            IsPrepared = false;
             await StateMachine.Wait();
             Document?.LastCompleteExecutionUtc = DateTime.UtcNow;
         }
