@@ -50,6 +50,24 @@ public static class CoreTaskExtensions
             if (difference < task.Delay.Value)
                 return false;
         }
+        
+        if (task.LastSuccessExecutionInUtc != null && task.DelaySuccess != null)
+        {
+            var currentUtcTime = DateTime.UtcNow;
+            var difference = 0.0;
+            
+            if (task.DelaySuccess.Type == DelayType.Days)
+                difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalDays;
+            if (task.DelaySuccess.Type == DelayType.Hours)
+                difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalHours;
+            if (task.DelaySuccess.Type == DelayType.Minutes)
+                difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalMinutes;
+            if (task.DelaySuccess.Type == DelayType.Seconds)
+                difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalSeconds;
+            
+            if (difference < task.Delay.Value)
+                return false;
+        }
 
         return true;
     }

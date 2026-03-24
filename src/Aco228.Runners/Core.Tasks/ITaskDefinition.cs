@@ -13,6 +13,7 @@ public interface ITaskDefinition
     string Name { get; }
     TaskDocument Document { get;}
     DateTime? LastExecutionInUtc { get; }
+    DateTime? LastSuccessExecutionInUtc { get; }
     Task Update(TaskDocument? document = null);
 }
 
@@ -27,7 +28,8 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
     public override DelayWindow Delay => Document.Delay;
     public override List<DayOfWeek>? OnlyOnDays => Document.OnlyOnDays;
     public override DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
-    
+    public override DateTime? LastSuccessExecutionInUtc => Document?.LastSuccessExecutionInUtc;
+
     public TaskDefinition(Type type)
     {
         Type = type;

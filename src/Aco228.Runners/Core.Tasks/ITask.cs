@@ -17,8 +17,10 @@ public abstract class TaskDateDefinition
     public virtual HourWindow From { get; } = HourWindow.DayStart;
     public virtual HourWindow To { get; } = HourWindow.DayEnd;
     public virtual DelayWindow Delay { get; } = new(1, DelayType.Hours);
+    public virtual DelayWindow? DelaySuccess { get; } = null;
     public virtual List<DayOfWeek>? OnlyOnDays { get;  } = null;
     public abstract DateTime? LastExecutionInUtc { get; }
+    public abstract DateTime? LastSuccessExecutionInUtc { get; }
 }
 
 public abstract class TaskBase : TaskDateDefinition, ITask
@@ -39,6 +41,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
     protected CancellationToken CancellationToken { get; set; }
     public override DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc;
+    public override DateTime? LastSuccessExecutionInUtc => TaskDefinition?.LastSuccessExecutionInUtc;
 
     protected abstract Task InternalExecute();
     protected virtual bool CanRun() => true;
@@ -97,6 +100,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
 
             await StateMachine.Wait();
             Document?.LastExecutionUtc = DateTime.UtcNow;
+            Document?.LastSuccessExecutionInUtc = DateTime.UtcNow;
         }
         catch (ActionContinueException ex)
         {
