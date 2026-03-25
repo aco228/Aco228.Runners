@@ -53,7 +53,10 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
 
     public async Task Update(TaskDocument? document = null)
     {
-        if(document != null) Document = document;
+        if (document != null)
+        {
+            Document = document;
+        }
         
         Document.LastExecutionUtc = DateTime.UtcNow;
         await Document.InsertOrUpdateAsync();

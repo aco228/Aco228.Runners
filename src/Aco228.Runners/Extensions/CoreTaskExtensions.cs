@@ -33,24 +33,6 @@ public static class CoreTaskExtensions
         if (task.OnlyOnDays != null && task.OnlyOnDays.Any() && !task.OnlyOnDays.Contains(currentTime.DayOfWeek))
             return false;
 
-        if (task.LastExecutionInUtc != null)
-        {
-            var currentUtcTime = DateTime.UtcNow;
-            var difference = 0.0;
-            
-            if (task.Delay.Type == DelayType.Days)
-                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalDays;
-            if (task.Delay.Type == DelayType.Hours)
-                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalHours;
-            if (task.Delay.Type == DelayType.Minutes)
-                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalMinutes;
-            if (task.Delay.Type == DelayType.Seconds)
-                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalSeconds;
-            
-            if (difference < task.Delay.Value)
-                return false;
-        }
-        
         if (task.LastSuccessExecutionInUtc != null && task.DelaySuccess != null)
         {
             var currentUtcTime = DateTime.UtcNow;
@@ -64,6 +46,24 @@ public static class CoreTaskExtensions
                 difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalMinutes;
             if (task.DelaySuccess.Type == DelayType.Seconds)
                 difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalSeconds;
+            
+            if (difference < task.Delay.Value)
+                return false;
+        }
+        
+        if (task.LastExecutionInUtc != null)
+        {
+            var currentUtcTime = DateTime.UtcNow;
+            var difference = 0.0;
+            
+            if (task.Delay.Type == DelayType.Days)
+                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalDays;
+            if (task.Delay.Type == DelayType.Hours)
+                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalHours;
+            if (task.Delay.Type == DelayType.Minutes)
+                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalMinutes;
+            if (task.Delay.Type == DelayType.Seconds)
+                difference = (currentUtcTime - task.LastExecutionInUtc.Value).TotalSeconds;
             
             if (difference < task.Delay.Value)
                 return false;
