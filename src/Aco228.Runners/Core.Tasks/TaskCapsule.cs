@@ -7,6 +7,7 @@ public class TaskCapsule
 {
     private readonly TaskManagerService _manager;
     public string Name => TaskDefinition.Name;
+    public string? Category => TaskDefinition.Category;
     public DateTime StartTime { get; private set; }
     public TaskBase Task { get; private set; }
     public TaskDefinition TaskDefinition { get; private set; }

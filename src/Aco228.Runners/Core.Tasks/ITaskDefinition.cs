@@ -8,7 +8,7 @@ namespace Aco228.Runners.Core.Tasks;
 
 public interface ITaskDefinition
 {
-    string? Categories { get; }
+    string? Category { get; }
     Type Type { get; }
     string Name { get; }
     TaskDocument Document { get;}
@@ -19,7 +19,7 @@ public interface ITaskDefinition
 
 public class TaskDefinition : TaskDateDefinition, ITaskDefinition
 {
-    public string? Categories { get; set; }
+    public string? Category { get; set; }
     public Type Type { get; set; }
     public string Name => Type.Name;
     public TaskDocument Document { get; internal set; }
@@ -38,7 +38,7 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
     public TaskBase CreateInstance()
     {
         var instance = Activator.CreateInstance(Type) as TaskBase;
-        Categories = instance!.Category;
+        Category = instance!.Category;
         return instance;
     }
 

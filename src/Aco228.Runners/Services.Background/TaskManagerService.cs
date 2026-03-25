@@ -98,6 +98,10 @@ public class TaskManagerService : HostServiceBase
             if (RunningTasks.Any(x => x.Value.Name == taskDefinition.Name))
                 continue;
 
+            if (!string.IsNullOrEmpty(taskDefinition.Category) 
+                && RunningTasks.Any(x => x.Value.Category?.Equals(taskDefinition.Category) == true))
+                continue;
+
             if (!taskDefinition.IsTimeOkay())
                 continue;
             
