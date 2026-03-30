@@ -47,7 +47,7 @@ public static class CoreTaskExtensions
             if (task.DelaySuccess.Type == DelayType.Seconds)
                 difference = (currentUtcTime - task.LastSuccessExecutionInUtc.Value).TotalSeconds;
             
-            if (difference < task.Delay.Value)
+            if (difference < task.DelaySuccess.Value)
                 return false;
         }
         

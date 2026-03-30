@@ -26,6 +26,7 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
     public override HourWindow From => Document.From;
     public override HourWindow To => Document.To;
     public override DelayWindow Delay => Document.Delay;
+    public override DelayWindow? DelaySuccess => Document.DelaySuccess;
     public override List<DayOfWeek>? OnlyOnDays => Document.OnlyOnDays;
     public override DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
     public override DateTime? LastSuccessExecutionInUtc => Document?.LastSuccessExecutionInUtc;

@@ -54,6 +54,7 @@ public class TaskManagerService : HostServiceBase
             }
 
             taskDocument.Delay = instance.Delay;
+            taskDocument.DelaySuccess = instance.DelaySuccess;
             taskDocument.From = instance.From;
             taskDocument.To = instance.To;
             taskDocument.OnlyOnDays = instance.OnlyOnDays;
