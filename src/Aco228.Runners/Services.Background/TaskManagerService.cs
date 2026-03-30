@@ -66,6 +66,15 @@ public class TaskManagerService : HostServiceBase
 
     protected override async Task ExecuteTick()
     {
+        if (_isShutdownMode)
+        {
+            if(RunningTasks.Count > 0)
+                return;
+            
+            Environment.Exit(0);
+            return;
+        }
+        
         if (PauseUntil != null)
         {
             if (PauseUntil.Value > DateTime.Now)
@@ -81,15 +90,6 @@ public class TaskManagerService : HostServiceBase
         {
             Console.WriteLine("Tick (max)"); 
             return;   
-        }
-
-        if (_isShutdownMode)
-        {
-            if(RunningTasks.Count > 0)
-                return;
-            
-            Environment.Exit(0);
-            return;
         }
         
         var candidates = new List<TaskDefinition>();
