@@ -141,8 +141,8 @@ public class TaskManagerService : HostServiceBase
         Console.WriteLine("Tick (exe)");
     }
 
-    public void AddOrUpdateIgnoreTask(string taskName) 
-        => TaskIgnores.AddOrUpdateTask(taskName);
+    public void AddOrRemoveIgnoreTask(string taskName) 
+        => TaskIgnores.AddOrRemoveTask(taskName);
 
     public void DemandShutdown()
     {

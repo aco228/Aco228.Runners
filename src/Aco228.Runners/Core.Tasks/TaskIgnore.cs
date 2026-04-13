@@ -12,7 +12,7 @@ public class TaskIgnore
 
 public static class TaskIgnoreExtensions
 {
-    public static void AddOrUpdateTask(this ConcurrentList<TaskIgnore> list, string taskName)
+    public static void AddOrRemoveTask(this ConcurrentList<TaskIgnore> list, string taskName)
     {
         if(list.Any(x => x.Name == taskName))
             list.RemoveOne(x => x.Name == taskName);
