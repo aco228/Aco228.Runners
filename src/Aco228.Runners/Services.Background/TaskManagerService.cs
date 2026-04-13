@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Aco228.Common.Extensions;
+using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions;
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Services;
@@ -24,6 +25,7 @@ public class TaskManagerService : HostServiceBase
     private readonly IHostMachineService _hostMachineService;
     private List<TaskDefinition> Tasks { get; set; } = new();
     public ConcurrentDictionary<string, TaskCapsule> RunningTasks { get; private set; } = new();
+    public ConcurrentList<TaskIgnore> TaskIgnores { get; set; } = new();
     
     public TaskManagerService(
         IMongoRepo<TaskDocument> taskRepo,
@@ -84,6 +86,7 @@ public class TaskManagerService : HostServiceBase
             PauseUntil = null;   
         }
 
+        TaskIgnores.ValidateIgnoreTasks();
         foreach (var (_, taskCapsule) in RunningTasks)
             await taskCapsule.Validate();
         
@@ -96,6 +99,9 @@ public class TaskManagerService : HostServiceBase
         var candidates = new List<TaskDefinition>();
         foreach (var taskDefinition in Tasks.OrderByDescending(x => x.Document.LastExecutionUtc))
         {
+            if (TaskIgnores.Any(x => x.Name == taskDefinition.Name))
+                continue;
+            
             if (RunningTasks.Any(x => x.Value.Name == taskDefinition.Name))
                 continue;
 
@@ -134,6 +140,9 @@ public class TaskManagerService : HostServiceBase
         
         Console.WriteLine("Tick (exe)");
     }
+
+    public void AddOrUpdateIgnoreTask(string taskName) 
+        => TaskIgnores.AddOrUpdateTask(taskName);
 
     public void DemandShutdown()
     {
