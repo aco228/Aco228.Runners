@@ -26,7 +26,7 @@ public static class CoreTaskExtensions
     {
         var currentTime = DateTime.Now;
 
-        var isTimeOkay = HourWindowExtensions.IsTimeOkay(task.From, task.To, currentTime); 
+        var isTimeOkay = HourWindowExtensions.IsTimeOkay(task.From, task.To); 
         if (!isTimeOkay)
             return false;
         

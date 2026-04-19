@@ -6,15 +6,17 @@ public class HourWindow
 {
     public int Hour { get; set; }
     public int Minute { get; set; } = 0;
+    public bool IsUtc { get; set; } = false;
 
     public static HourWindow DayStart => new(0);
     public static HourWindow DayEnd => new(23,59);
 
     public HourWindow () { }
-    public HourWindow (int hour, int minute = 0)
+    public HourWindow (int hour, int minute = 0, bool isUtc = false)
     {
         Hour = hour;
         Minute = minute;
+        IsUtc = isUtc;
     }
 
     public override string ToString() => $"{Hour.WithZeroPrefix()}:{Minute.WithZeroPrefix()}";
@@ -40,10 +42,15 @@ public class DelayWindow
 
 public static class HourWindowExtensions
 {
-    public static bool IsTimeOkay(HourWindow from, HourWindow to, DateTime currentTime)
+    public static bool IsTimeOkay(HourWindow from, HourWindow to)
     {
-        return (from.Hour == currentTime.Hour && currentTime.Minute > from.Minute || currentTime.Hour > from.Hour)
-               && (currentTime.Hour == to.Hour && currentTime.Minute < to.Minute || currentTime.Hour < to.Hour);
+        var currentTimeFrom = from.IsUtc ? DateTime.UtcNow : DateTime.Now;
+        var currentTimeTo = to.IsUtc ? DateTime.UtcNow : DateTime.Now;
+
+        var afterFrom = currentTimeFrom.Hour > from.Hour || (currentTimeFrom.Hour == from.Hour && currentTimeFrom.Minute >= from.Minute);
+        var beforeTo = currentTimeTo.Hour < to.Hour || (currentTimeTo.Hour == to.Hour && currentTimeTo.Minute < to.Minute);
+
+        return afterFrom && beforeTo;
     }
     
     public static bool IsLessThan(this HourWindow window, DateTime currentTime)
