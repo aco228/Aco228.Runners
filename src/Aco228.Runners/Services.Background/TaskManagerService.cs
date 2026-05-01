@@ -86,9 +86,6 @@ public class TaskManagerService : HostServiceBase
             
             PauseUntil = null;   
         }
-        
-        if (RunningTasks.Count == 0)
-            ChromeKillHelper.TryKill();
 
         TaskIgnores.ValidateIgnoreTasks();
         foreach (var (_, taskCapsule) in RunningTasks)
