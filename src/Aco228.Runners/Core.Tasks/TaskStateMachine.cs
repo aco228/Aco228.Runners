@@ -83,12 +83,16 @@ public class TaskStateMachine
             if (!_queue.IsEmpty) TryStart();
         }
     }
-
     public async Task Wait()
     {
         if (_loopTask != null)
             await _loopTask;
-        
-        await Task.WhenAll(_tasks);
+
+        // Drain all semaphore slots — proves every Task.Run has hit Semaphore.Release()
+        for (int i = 0; i < _limit; i++)
+            await Semaphore.WaitAsync();
+
+        // Reset so the machine can be reused
+        Semaphore.Release(_limit);
     }
 }
