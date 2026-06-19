@@ -19,6 +19,7 @@ public class TaskManagerService : HostServiceBase
     public static TaskManagerService? Instance { get; private set; }
 
     public DateTime? PauseUntil { get; set; } = null;
+    public bool IsRestartRequested { get; set; } = false;
     protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
 
     private bool _isShutdownMode = false;
