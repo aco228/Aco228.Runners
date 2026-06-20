@@ -15,12 +15,12 @@ namespace Aco228.Runners.Services.Background;
 public class TaskManagerService : HostServiceBase
 {
     private static int MAXIMUM_PER_TURN = 11;
-    
+    public static TimeSpan Delay = TimeSpan.FromSeconds(15);
     public static TaskManagerService? Instance { get; private set; }
 
     public DateTime? PauseUntil { get; set; } = null;
     public bool IsRestartRequested { get; set; } = false;
-    protected override TimeSpan DelayBetweenRetries => TimeSpan.FromSeconds(15);
+    protected override TimeSpan DelayBetweenRetries => Delay;
 
     private bool _isShutdownMode = false;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
