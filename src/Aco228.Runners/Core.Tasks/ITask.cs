@@ -33,6 +33,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     public TaskDocument? Document { get; set; }
     protected TaskStateMachine StateMachine { get; set; } = new();
     public EventHandler? OnCompleted;
+    public virtual int PriorityIndex { get; } = 0;
     
     internal ITaskDefinition? TaskDefinition { get; set; } 
     internal virtual bool RunSync { get; } = false;

@@ -30,6 +30,7 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
     public override List<DayOfWeek>? OnlyOnDays => Document.OnlyOnDays;
     public override DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
     public override DateTime? LastSuccessExecutionInUtc => Document?.LastSuccessExecutionInUtc;
+    public int PriorityIndex { get; set; } = 0;
 
     public TaskDefinition(Type type)
     {

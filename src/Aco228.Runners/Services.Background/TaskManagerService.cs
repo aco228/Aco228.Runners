@@ -63,6 +63,7 @@ public class TaskManagerService : HostServiceBase
             taskDocument.To = instance.To;
             taskDocument.OnlyOnDays = instance.OnlyOnDays;
             taskDefinition.Document = taskDocument;
+            taskDefinition.PriorityIndex = instance.PriorityIndex;
             Tasks.Add(taskDefinition);
         }
         
@@ -99,7 +100,7 @@ public class TaskManagerService : HostServiceBase
         }
         
         var candidates = new List<TaskDefinition>();
-        foreach (var taskDefinition in Tasks.OrderByDescending(x => x.Document.LastExecutionUtc))
+        foreach (var taskDefinition in Tasks.OrderByDescending(x => x.PriorityIndex).ThenByDescending(x => x.Document.LastExecutionUtc))
         {
             if (TaskIgnores.Any(x => x.Name == taskDefinition.Name))
                 continue;
@@ -123,7 +124,7 @@ public class TaskManagerService : HostServiceBase
             return;
         }
 
-        foreach (var candidate in candidates.OrderBy(x => x.Document.LastExecutionUtc))
+        foreach (var candidate in candidates.OrderByDescending(x => x.PriorityIndex).ThenBy(x => x.Document.LastExecutionUtc))
         {
             if (RunningTasks.Count >= MAXIMUM_PER_TURN)
             {
