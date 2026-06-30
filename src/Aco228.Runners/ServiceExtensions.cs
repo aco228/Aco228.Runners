@@ -1,9 +1,11 @@
 ﻿using Aco228.Common.Extensions;
+using Aco228.Common.Helpers;
 using Aco228.Common.Models;
 using Aco228.MongoDb.Helpers;
 using Aco228.MongoDb.Services;
 using Aco228.Runners.Core;
 using Aco228.Runners.Core.Tasks;
+using Aco228.Runners.Models.Actions.Exceptions;
 using Aco228.Runners.Services;
 using Aco228.Runners.Services.Background;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +15,14 @@ namespace Aco228.Runners;
 internal static class TaskCollection
 {
     public static List<Type> Tasks { get; set; } = new();
+
+    public static void Add(Type type)
+    {
+        if (Tasks.Any(x => x.FullName == type.FullName))
+            return;
+        
+        Tasks.Add(type);
+    }
 }
 
 public static class ServiceExtensions
@@ -20,11 +30,16 @@ public static class ServiceExtensions
     public static void RegisterRunnersRepositories<T>(this IServiceCollection services) where T : IMongoDbContext
     {
         services.RegisterRepositoriesFromAssembly<T>(typeof(ServiceExtensions).Assembly);
-    } 
+    }
+
+    public static void RegisterTaskByType(this IServiceCollection services, Type type)
+    {
+        TaskCollection.Add(type);
+    }
     
     public static void RegisterTask<T>(this IServiceCollection services) where T : TaskBase
     {
-        TaskCollection.Tasks.Add(typeof(T));
+        TaskCollection.Add(typeof(T));
     }
 
     public static void ClearBackgroundTasks(this IServiceCollection services)
