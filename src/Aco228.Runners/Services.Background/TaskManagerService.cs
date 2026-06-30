@@ -56,7 +56,7 @@ public class TaskManagerService : HostServiceBase
             var taskDocument = currentTasks.FirstOrDefault(x => x.Name == taskType.Name);
             if (taskDocument == null)
             {
-                taskDocument = new() { Name = taskType.Name };
+                taskDocument = new() { Name = taskType.Name, Owner = _hostMachineService.Name };
                 currentTasks.Add(taskDocument);
             }
 
