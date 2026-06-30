@@ -30,6 +30,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     public virtual bool PanicOnException { get; } = true;
     public virtual string? Description { get; } = null;
     public virtual string? Category { get; } = null;
+    public virtual bool IsDistributed { get; } = false; 
     public TaskDocument? Document { get; set; }
     protected TaskStateMachine StateMachine { get; set; } = new();
     public EventHandler? OnCompleted;
@@ -39,7 +40,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
     internal virtual bool RunSync { get; } = false;
     internal bool IsPrepared { get; set; } = false;
     internal DateTime StartTime { get; set; }
-    internal virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
+    public virtual TimeSpan MaximumExecutionAllowed { get; } = TimeSpan.FromMinutes(20);
     protected CancellationToken CancellationToken { get; set; }
     public override DateTime? LastExecutionInUtc => TaskDefinition?.LastExecutionInUtc ?? Document?.LastExecutionUtc;
     public override DateTime? LastSuccessExecutionInUtc => TaskDefinition?.LastSuccessExecutionInUtc ?? Document?.LastSuccessExecutionInUtc;
