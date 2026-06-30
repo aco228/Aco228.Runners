@@ -47,9 +47,8 @@ public static class ServiceExtensions
         TaskCollection.Tasks.Clear();
     }
 
-    public static void RegisterTaskManager(this IServiceCollection services, bool isMainServer, bool isSyncRequired)
+    public static void RegisterTaskManager(this IServiceCollection services, bool isSyncRequired)
     {
-        TaskManagerConstants.IsMainServer = isMainServer;
         TaskManagerConstants.IsSyncRequired = isSyncRequired;
         services.RegisterBackgroundServices<TaskManagerService>();
     }

@@ -86,7 +86,7 @@ public class TaskManagerService : HostServiceBase
             return;
         }
 
-        if (TaskManagerConstants.IsMainServer == false && TaskManagerConstants.IsSyncRequired)
+        if (TaskManagerConstants.IsSyncRequired)
             await TryToSync();
         
         if (PauseUntil != null)
@@ -169,16 +169,29 @@ public class TaskManagerService : HostServiceBase
 
     protected async Task TryToSync()
     {
-        var provider = ServiceProviderHelper.GetService<ITaskManagerSyncProvider>();
-        if(provider == null)
+        if(TaskManagerConstants.IsSyncRequired == false)
             return;
+        
+        Console.WriteLine($" ||| Try sync");
+        
+        var provider = ServiceProviderHelper.GetService<ITaskManagerSyncProvider>();
+        if (provider == null)
+        {
+            Console.WriteLine($" ||| Sync provider is null !!!!!");
+            return;   
+        }
 
         var sync = await provider.Sync();
-        if(sync == null)
+        if (sync == null)
+        {
+            Console.WriteLine($" ||| Sync error !!!!!");
             return;
+        }
         
         PauseUntil = sync.PausedUntil;
         TaskIgnores = sync.TaskIgnores.ToConcurrentList();
+        
+        Console.WriteLine($" ||| Sync completed");
     }
 
     public TaskManagerSyncResponse GetSyncModel()
