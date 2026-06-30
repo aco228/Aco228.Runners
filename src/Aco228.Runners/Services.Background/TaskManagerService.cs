@@ -2,6 +2,7 @@
 using Aco228.Common.Extensions;
 using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions;
+using Aco228.MongoDb.Extensions.MongoFiltersExtensions;
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Services;
 using Aco228.Runners.Core;
@@ -43,7 +44,7 @@ public class TaskManagerService : HostServiceBase
         MAXIMUM_PER_TURN = 1;
         #endif
         
-        var currentTasks = await _taskRepo.Track().Full().ToListAsync();
+        var currentTasks = await _taskRepo.Track().Full().Eq(x => x.Owner, _hostMachineService.Name).ToListAsync();
         foreach (var taskType in TaskCollection.Tasks)
         {
             var taskDefinition = new TaskDefinition(taskType);
