@@ -184,6 +184,7 @@ public class TaskManagerService : HostServiceBase
         var sync = await provider.Sync();
         if (sync == null)
         {
+            PauseUntil = DateTime.UtcNow.AddMinutes(5);
             Console.WriteLine($" ||| Sync error !!!!!");
             return;
         }
