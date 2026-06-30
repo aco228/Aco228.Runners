@@ -43,6 +43,9 @@ public class TaskManagerService : HostServiceBase
         #if DEBUG
         MAXIMUM_PER_TURN = 1;
         #endif
+
+        if (string.IsNullOrEmpty(_hostMachineService.Name))
+            throw new InvalidOperationException($"Unknown machine name on TaskManagerInitialize");
         
         var currentTasks = await _taskRepo.Track().Full().Eq(x => x.Owner, _hostMachineService.Name).ToListAsync();
         foreach (var taskType in TaskCollection.Tasks)
