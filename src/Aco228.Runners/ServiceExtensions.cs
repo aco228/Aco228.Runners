@@ -20,7 +20,7 @@ public static class ServiceExtensions
     public static void RegisterRunnersRepositories<T>(this IServiceCollection services) where T : IMongoDbContext
     {
         services.RegisterRepositoriesFromAssembly<T>(typeof(ServiceExtensions).Assembly);
-    }
+    } 
     
     public static void RegisterTask<T>(this IServiceCollection services) where T : TaskBase
     {
