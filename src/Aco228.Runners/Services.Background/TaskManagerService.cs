@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Aco228.Common;
 using Aco228.Common.Extensions;
 using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions;
@@ -9,6 +10,7 @@ using Aco228.Runners.Core;
 using Aco228.Runners.Core.Tasks;
 using Aco228.Runners.Documents;
 using Aco228.Runners.Extensions;
+using Aco228.Runners.Models.TaskManager;
 
 namespace Aco228.Runners.Services.Background;
 
@@ -83,6 +85,9 @@ public class TaskManagerService : HostServiceBase
             Environment.Exit(0);
             return;
         }
+
+        if (TaskManagerConstants.IsMainServer == false && TaskManagerConstants.IsSyncRequired)
+            await TryToSync();
         
         if (PauseUntil != null)
         {
@@ -161,4 +166,25 @@ public class TaskManagerService : HostServiceBase
         Console.WriteLine($" -- finished task {task.Name}");
         RunningTasks.WaitRemove(task.Name);
     }
+
+    protected async Task TryToSync()
+    {
+        var provider = ServiceProviderHelper.GetService<ITaskManagerSyncProvider>();
+        if(provider == null)
+            return;
+
+        var sync = await provider.Sync();
+        if(sync == null)
+            return;
+        
+        PauseUntil = sync.PausedUntil;
+        TaskIgnores = sync.TaskIgnores.ToConcurrentList();
+    }
+
+    public TaskManagerSyncResponse GetSyncModel()
+        => new()
+        {
+            PausedUntil = PauseUntil,
+            TaskIgnores = TaskIgnores.ToList(),
+        };
 }
