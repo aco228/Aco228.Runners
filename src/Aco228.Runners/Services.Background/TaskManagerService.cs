@@ -81,7 +81,7 @@ public class TaskManagerService : HostServiceBase
         {
             if (RunningTasks.Count > 0)
             {
-                Console.WriteLine("--- Under shutdown mode: " + string.Join(", ", RunningTasks.Keys));
+                Console.WriteLine("--- Under shutdown mode. Waiting: " + string.Join(", ", RunningTasks.Keys));
                 return;
             }
          
