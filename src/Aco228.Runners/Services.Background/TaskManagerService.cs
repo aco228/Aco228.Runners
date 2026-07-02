@@ -79,7 +79,8 @@ public class TaskManagerService : HostServiceBase
     {
         if (_isShutdownMode)
         {
-            if(RunningTasks.Count > 0)
+            Console.WriteLine("--- Under shutdown mode");
+            if (RunningTasks.Count > 0)
                 return;
             
             Environment.Exit(0);
