@@ -79,10 +79,13 @@ public class TaskManagerService : HostServiceBase
     {
         if (_isShutdownMode)
         {
-            Console.WriteLine("--- Under shutdown mode");
             if (RunningTasks.Count > 0)
+            {
+                Console.WriteLine("--- Under shutdown mode: " + string.Join(", ", RunningTasks.Keys));
                 return;
-            
+            }
+         
+            Console.WriteLine("--- Shutdown");
             Environment.Exit(0);
             return;
         }
