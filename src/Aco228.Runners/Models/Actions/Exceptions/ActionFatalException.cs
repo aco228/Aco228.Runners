@@ -2,8 +2,9 @@
 
 public class ActionFatalException : Exception
 {
-    public ActionFatalException(string message) : base(message)
+    public bool RaiseReporting { get; private set; } = true;
+    public ActionFatalException(string message, bool raiseReporting = true) : base(message)
     {
-        
+        RaiseReporting = raiseReporting;
     }
 }
