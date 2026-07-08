@@ -17,6 +17,7 @@ namespace Aco228.Runners.Services.Background;
 public class TaskManagerService : HostServiceBase
 {
     private static int MAXIMUM_PER_TURN = 11;
+    private static bool IS_DEBUG = false;
     public static TimeSpan Delay = TimeSpan.FromSeconds(15);
     public static TaskManagerService? Instance { get; private set; }
 
@@ -43,6 +44,7 @@ public class TaskManagerService : HostServiceBase
     public override async Task Initialize()
     {
         #if DEBUG
+        IS_DEBUG = true;
         MAXIMUM_PER_TURN = 1;
         #endif
 
@@ -93,7 +95,7 @@ public class TaskManagerService : HostServiceBase
         if (TaskManagerConstants.IsSyncRequired)
             await TryToSync();
         
-        if (PauseUntil != null)
+        if (IS_DEBUG == false && PauseUntil != null)
         {
             if (PauseUntil.Value > DateTime.Now)
                 return;
@@ -112,7 +114,8 @@ public class TaskManagerService : HostServiceBase
         }
         
         var candidates = new List<TaskDefinition>();
-        foreach (var taskDefinition in Tasks.OrderByDescending(x => x.PriorityIndex).ThenByDescending(x => x.Document.LastExecutionUtc))
+        var taskDefinitions = Tasks.OrderByDescending(x => x.PriorityIndex).ThenByDescending(x => x.Document.LastExecutionUtc).ToList();
+        foreach (var taskDefinition in taskDefinitions)
         {
             if (TaskIgnores.Any(x => x.Name == taskDefinition.Name))
                 continue;
