@@ -18,7 +18,7 @@ public static class CoreTaskExtensions
 
     public static T SetParallelCount<T>(this T task, int count) where T : TaskBase
     {
-        task.RunCandidatesInParallelCount = count;
+        task.NumberOfCandidatesInParallelCount = count;
         return task;
     }
     

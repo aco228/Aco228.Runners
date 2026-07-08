@@ -26,7 +26,7 @@ public abstract class TaskDateDefinition
 public abstract class TaskBase : TaskDateDefinition, ITask
 {
     public string Name { get; set; }
-    public virtual int RunCandidatesInParallelCount { get; set; } = 1;
+    public virtual int NumberOfCandidatesInParallelCount { get; set; } = 1;
     public virtual bool PanicOnException { get; } = true;
     public virtual string? Description { get; } = null;
     public virtual string? Category { get; } = null;
