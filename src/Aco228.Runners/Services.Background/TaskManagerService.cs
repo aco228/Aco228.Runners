@@ -135,7 +135,7 @@ public class TaskManagerService : HostServiceBase
 
         if (!candidates.Any())
         {
-            Console.WriteLine("Tick (no_can)");
+            // Console.WriteLine("Tick (no_can)");
             return;
         }
 
