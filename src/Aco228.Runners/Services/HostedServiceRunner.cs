@@ -98,5 +98,6 @@ public static class HostedServiceRunner
             await asyncDisposable.DisposeAsync();
 
         Console.WriteLine("Shutdown complete.");
+        Environment.Exit(0);
     }
 }
