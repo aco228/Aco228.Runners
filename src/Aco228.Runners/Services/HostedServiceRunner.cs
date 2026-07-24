@@ -34,6 +34,8 @@ public static class HostedServiceRunner
         // Observe background crashes
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
+            // e.SetObserved();
+            
             Console.WriteLine("Unobserved task exception:");
             Console.WriteLine(e.Exception);
         };
