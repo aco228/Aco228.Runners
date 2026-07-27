@@ -202,6 +202,19 @@ public class TaskManagerService : HostServiceBase
         Console.WriteLine($" ||| Sync completed");
     }
 
+    public void RequestTaskExecution(string? taskName)
+    {
+        if(string.IsNullOrEmpty(taskName))
+            return;
+        
+        var task = Tasks.FirstOrDefault(x => x.Name == taskName);
+        if(task == null)
+            return;
+        
+        task.Document.LastExecutionUtc = DateTime.MinValue;
+        task.ImmediateExecutionRequested = true;
+    }
+
     public TaskManagerSyncResponse GetSyncModel()
         => new()
         {

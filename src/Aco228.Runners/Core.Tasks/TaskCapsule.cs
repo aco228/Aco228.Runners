@@ -24,7 +24,7 @@ public class TaskCapsule
     public async Task<bool> TryStart(bool forceExecute)
     {
         Task = TaskDefinition.Initialize();
-        if (!Task.IsTimeOkay())
+        if (TaskDefinition.ImmediateExecutionRequested == false && !Task.IsTimeOkay())
             return false;
 
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
@@ -32,14 +32,18 @@ public class TaskCapsule
         try
         {
             var isReady = await Task.Prepare(force: true);
-            if (isReady == false)
+            if (TaskDefinition.ImmediateExecutionRequested == false && isReady == false)
             {
                 Task.IsPrepared = false;
                 return false;
             }
 
             StartTime = DateTime.Now;
-            Task.OnCompleted += (sender, args) => { _manager.OnTaskFinished(this); };
+            Task.OnCompleted += (sender, args) =>
+            {
+                TaskDefinition.ImmediateExecutionRequested = null;
+                _manager.OnTaskFinished(this);
+            };
 
             Execution = Task
                 .ExecuteTask(TaskDefinition.Name, CancellationToken.Token, forceExecute)

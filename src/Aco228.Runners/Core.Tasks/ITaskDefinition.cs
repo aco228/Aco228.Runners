@@ -31,6 +31,7 @@ public class TaskDefinition : TaskDateDefinition, ITaskDefinition
     public override DateTime? LastExecutionInUtc => Document?.LastExecutionUtc;
     public override DateTime? LastSuccessExecutionInUtc => Document?.LastSuccessExecutionInUtc;
     public int PriorityIndex { get; set; } = 0;
+    public bool? ImmediateExecutionRequested { get; set; } = false;
 
     public TaskDefinition(Type type)
     {
