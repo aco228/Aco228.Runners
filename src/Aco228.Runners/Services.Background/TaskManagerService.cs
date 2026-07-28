@@ -109,7 +109,6 @@ public class TaskManagerService : HostServiceBase
 
         if (TaskManagerConstants.IsSyncRequired)
         {
-            
             await TryToSync();
         }
         
