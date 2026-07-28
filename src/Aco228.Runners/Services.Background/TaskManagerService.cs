@@ -81,6 +81,19 @@ public class TaskManagerService : HostServiceBase
 
     protected override async Task ExecuteTick()
     {
+        // remove completed tasks
+        foreach (var completedTask in CompletedTasks)
+        {
+            CompletedTasks.Remove(completedTask);
+            var taskDefinition = Tasks.FirstOrDefault(x => x.Name.Equals(completedTask));
+            RunningTasks.TryRemove(completedTask, out _);
+            if (taskDefinition != null)
+            {
+                taskDefinition.Document.LastExecutionUtc = DateTime.UtcNow;
+                await taskDefinition.Document.InsertOrUpdateSingleAsync();
+            }
+        }
+        
         if (_isShutdownMode)
         {
             if (RunningTasks.Count > 0)
@@ -103,19 +116,6 @@ public class TaskManagerService : HostServiceBase
                 return;
             
             PauseUntil = null;   
-        }
-
-        // remove completed tasks
-        foreach (var completedTask in CompletedTasks)
-        {
-            CompletedTasks.Remove(completedTask);
-            var taskDefinition = Tasks.FirstOrDefault(x => x.Name.Equals(completedTask));
-            RunningTasks.TryRemove(completedTask, out _);
-            if (taskDefinition != null)
-            {
-                taskDefinition.Document.LastExecutionUtc = DateTime.UtcNow;
-                await taskDefinition.Document.InsertOrUpdateSingleAsync();
-            }
         }
 
         TaskIgnores.ValidateIgnoreTasks();
