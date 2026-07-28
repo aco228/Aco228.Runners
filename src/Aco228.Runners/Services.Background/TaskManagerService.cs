@@ -211,7 +211,7 @@ public class TaskManagerService : HostServiceBase
             return;
         
         var task = Tasks.FirstOrDefault(x => x.Name == taskName);
-        if(task == null)
+        if (task == null)
             return;
         
         task.Document.LastExecutionUtc = DateTime.MinValue;
