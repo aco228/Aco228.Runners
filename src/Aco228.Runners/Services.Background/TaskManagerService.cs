@@ -177,7 +177,7 @@ public class TaskManagerService : HostServiceBase
             }
         }
         
-        Console.WriteLine($"Tick (exe) (running: {RunningTasks.Count}/{MAXIMUM_PER_TURN}, ct: {CompletedTasks})");
+        Console.WriteLine($"Tick (exe) (running: {RunningTasks.Count}/{MAXIMUM_PER_TURN}, ct: {CompletedTasks.Count})");
     }
 
     public void AddOrRemoveIgnoreTask(string taskName) 
