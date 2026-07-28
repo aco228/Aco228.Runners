@@ -159,7 +159,8 @@ public class TaskManagerService : HostServiceBase
             return;
         }
 
-        foreach (var candidate in candidates.OrderByDescending(x => x.PriorityIndex).ThenBy(x => x.Document.LastExecutionUtc))
+        candidates = candidates.OrderByDescending(x => x.PriorityIndex).ThenBy(x => x.Document.LastExecutionUtc).ToList();
+        foreach (var candidate in candidates)
         {
             if (RunningTasks.Count >= MAXIMUM_PER_TURN)
             {
@@ -176,7 +177,7 @@ public class TaskManagerService : HostServiceBase
             }
         }
         
-        Console.WriteLine("Tick (exe)");
+        Console.WriteLine($"Tick (exe) (running: {RunningTasks.Count}/{MAXIMUM_PER_TURN}, ct: {CompletedTasks})");
     }
 
     public void AddOrRemoveIgnoreTask(string taskName) 
