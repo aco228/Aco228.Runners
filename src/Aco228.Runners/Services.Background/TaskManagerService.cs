@@ -209,11 +209,15 @@ public class TaskManagerService : HostServiceBase
     {
         if(string.IsNullOrEmpty(taskName))
             return;
-        
+     
         var task = Tasks.FirstOrDefault(x => x.Name == taskName);
         if (task == null)
+        {
+            Console.WriteLine($" ||| RequestTaskExecution. Does not exist: {taskName}");
             return;
+        }
         
+        Console.WriteLine($" ||| RequestTaskExecution. Scheduled: {taskName}");
         task.Document.LastExecutionUtc = DateTime.MinValue;
         task.ImmediateExecutionRequested = true;
     }
