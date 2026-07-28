@@ -24,7 +24,7 @@ public class TaskCapsule
     public async Task<bool> TryStart(bool forceExecute)
     {
         Task = TaskDefinition.Initialize();
-        if (TaskDefinition.ImmediateExecutionRequested == false && !Task.IsTimeOkay())
+        if (!Task.IsTimeOkay())
             return false;
 
         MaximumAllowedExecution = Task.MaximumExecutionAllowed.Add(TimeSpan.FromMinutes(5));
@@ -32,7 +32,7 @@ public class TaskCapsule
         try
         {
             var isReady = await Task.Prepare(force: true);
-            if (TaskDefinition.ImmediateExecutionRequested == false && isReady == false)
+            if (isReady == false)
             {
                 Task.IsPrepared = false;
                 return false;
@@ -41,7 +41,7 @@ public class TaskCapsule
             StartTime = DateTime.Now;
             Task.OnCompleted += (sender, args) =>
             {
-                TaskDefinition.ImmediateExecutionRequested = null;
+                TaskDefinition.ImmediateExecutionRequested = false;
                 _manager.OnTaskFinished(this);
             };
 

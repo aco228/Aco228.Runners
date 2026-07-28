@@ -174,7 +174,7 @@ public class TaskManagerService : HostServiceBase
     internal void OnTaskFinished(TaskCapsule task)
     {
         Console.WriteLine($" -- finished task {task.Name}");
-        RunningTasks.WaitRemove(task.Name);
+        RunningTasks.TryRemove(task.Name, out _);
     }
 
     protected async Task TryToSync()
