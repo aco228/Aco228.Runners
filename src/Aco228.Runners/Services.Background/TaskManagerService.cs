@@ -3,6 +3,7 @@ using Aco228.Common;
 using Aco228.Common.Extensions;
 using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions;
+using Aco228.MongoDb.Extensions.MongoDocuments;
 using Aco228.MongoDb.Extensions.MongoFiltersExtensions;
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Services;
@@ -30,6 +31,7 @@ public class TaskManagerService : HostServiceBase
     private readonly IHostMachineService _hostMachineService;
     private List<TaskDefinition> Tasks { get; set; } = new();
     public ConcurrentDictionary<string, TaskCapsule> RunningTasks { get; private set; } = new();
+    public HashSet<string> CompletedTasks { get; private set; } = new();
     public ConcurrentList<TaskIgnore> TaskIgnores { get; set; } = new();
     
     public TaskManagerService(
@@ -103,6 +105,19 @@ public class TaskManagerService : HostServiceBase
             PauseUntil = null;   
         }
 
+        // remove completed tasks
+        foreach (var completedTask in CompletedTasks)
+        {
+            CompletedTasks.Remove(completedTask);
+            var taskDefinition = Tasks.FirstOrDefault(x => x.Name.Equals(completedTask));
+            RunningTasks.TryRemove(completedTask, out _);
+            if (taskDefinition != null)
+            {
+                taskDefinition.Document.LastExecutionUtc = DateTime.UtcNow;
+                await taskDefinition.Document.InsertOrUpdateSingleAsync();
+            }
+        }
+
         TaskIgnores.ValidateIgnoreTasks();
         foreach (var (_, taskCapsule) in RunningTasks)
             await taskCapsule.Validate();
@@ -174,7 +189,7 @@ public class TaskManagerService : HostServiceBase
     internal void OnTaskFinished(TaskCapsule task)
     {
         Console.WriteLine($" -- finished task {task.Name}");
-        RunningTasks.TryRemove(task.Name, out _);
+        CompletedTasks.Add(task.Name);
     }
 
     protected async Task TryToSync()
