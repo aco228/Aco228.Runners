@@ -114,7 +114,10 @@ public class TaskManagerService : HostServiceBase
         }
         
         var candidates = new List<TaskDefinition>();
-        var taskDefinitions = Tasks.OrderByDescending(x => x.PriorityIndex).ThenByDescending(x => x.Document.LastExecutionUtc).ToList();
+        var taskDefinitions = Tasks.OrderByDescending(x => x.PriorityIndex)
+            .ThenByDescending(x => x.Document.LastExecutionUtc)
+            .ToList();
+        
         foreach (var taskDefinition in taskDefinitions)
         {
             if (TaskIgnores.Any(x => x.Name == taskDefinition.Name))

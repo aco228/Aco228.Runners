@@ -45,6 +45,7 @@ public class TaskCapsule
                 _manager.OnTaskFinished(this);
             };
 
+            TaskDefinition.ImmediateExecutionRequested = false;
             Execution = Task
                 .ExecuteTask(TaskDefinition.Name, CancellationToken.Token, forceExecute)
                 .WaitAsync(CancellationToken.Token);
