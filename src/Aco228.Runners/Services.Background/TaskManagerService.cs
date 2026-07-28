@@ -108,7 +108,10 @@ public class TaskManagerService : HostServiceBase
         }
 
         if (TaskManagerConstants.IsSyncRequired)
+        {
+            
             await TryToSync();
+        }
         
         if (IS_DEBUG == false && PauseUntil != null)
         {

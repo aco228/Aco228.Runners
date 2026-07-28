@@ -47,7 +47,7 @@ public abstract class TaskBase : TaskDateDefinition, ITask
 
     protected abstract Task InternalExecute();
     protected virtual bool CanRun() => true;
-    internal virtual Task OnFinish() => Task.FromResult(true);
+    public virtual Task OnFinish() => Task.FromResult(true);
     
     public Task ExecuteTask(bool forceExecute = false)
         => ExecuteTask(Name, CancellationToken.None, forceExecute);
