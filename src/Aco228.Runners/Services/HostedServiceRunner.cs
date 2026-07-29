@@ -37,7 +37,6 @@ public static class HostedServiceRunner
             // e.SetObserved();
             Console.WriteLine("Unobserved task exception:");
             Console.WriteLine(e.Exception);
-            Environment.Exit(1);
         };
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
