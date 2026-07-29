@@ -35,9 +35,9 @@ public static class HostedServiceRunner
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
             // e.SetObserved();
-            
             Console.WriteLine("Unobserved task exception:");
             Console.WriteLine(e.Exception);
+            Environment.Exit(1);
         };
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
