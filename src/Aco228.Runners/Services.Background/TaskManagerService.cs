@@ -26,7 +26,7 @@ public class TaskManagerService : HostServiceBase
     public bool IsRestartRequested { get; set; } = false;
     protected override TimeSpan DelayBetweenRetries => Delay;
 
-    private bool _isShutdownMode = false;
+    private DateTime? _shutdownRequestedDate = null;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
     private readonly IHostMachineService _hostMachineService;
     private List<TaskDefinition> Tasks { get; set; } = new();
@@ -94,9 +94,9 @@ public class TaskManagerService : HostServiceBase
             }
         }
         
-        if (_isShutdownMode)
+        if (_shutdownRequestedDate != null)
         {
-            if (RunningTasks.Count > 0)
+            if ((DateTime.Now - _shutdownRequestedDate.Value).TotalMinutes < 25 && RunningTasks.Count > 0)
             {
                 Console.WriteLine("--- Under shutdown mode. Waiting: " + string.Join(", ", RunningTasks.Keys));
                 return;
@@ -186,7 +186,7 @@ public class TaskManagerService : HostServiceBase
     public void DemandShutdown()
     {
         Console.WriteLine("[[- TASK MANAGER RECEIVED RESTART");
-        _isShutdownMode = true;
+        _shutdownRequestedDate = DateTime.Now;
     }
     
     internal void OnTaskFinished(TaskCapsule task)
