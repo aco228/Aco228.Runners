@@ -185,6 +185,9 @@ public class TaskManagerService : HostServiceBase
 
     public void DemandShutdown()
     {
+        if (TaskManagerConstants.CanPerformRestart == false)
+            return;
+        
         Console.WriteLine("[[- TASK MANAGER RECEIVED RESTART");
         _shutdownRequestedDate = DateTime.Now;
     }
