@@ -35,13 +35,13 @@ public static class HostedServiceRunner
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
             // e.SetObserved();
-            Console.WriteLine("Unobserved task exception:");
+            Console.WriteLine("HostedServiceRunner: Unobserved task exception:");
             Console.WriteLine(e.Exception);
         };
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
-            Console.WriteLine("Unhandled exception:");
+            Console.WriteLine("HostedServiceRunner: Unhandled exception:");
             Console.WriteLine(e.ExceptionObject);
             RequestStop();
         };
@@ -49,7 +49,7 @@ public static class HostedServiceRunner
         //  Ctrl+C
         Console.CancelKeyPress += (_, e) =>
         {
-            Console.WriteLine("CTRL-C PRESSED");
+            Console.WriteLine("HostedServiceRunner: CTRL-C PRESSED");
             e.Cancel = true;
             RequestStop();
         };
@@ -57,7 +57,7 @@ public static class HostedServiceRunner
         // Docker / SIGTERM / service shutdown
         AppDomain.CurrentDomain.ProcessExit += (_, __) =>
         {
-            Console.WriteLine("Docker / SIGTERM / service shutdown");
+            Console.WriteLine("HostedServiceRunner: Docker / SIGTERM / service shutdown");
             RequestStop();
         };
 
@@ -77,10 +77,11 @@ public static class HostedServiceRunner
         }
         catch (TaskCanceledException)
         {
+            Console.WriteLine("HostedServiceRunner: TaskCanceledException");
             // expected on shutdown
         }
 
-        Console.WriteLine("Stopping hosted services...");
+        Console.WriteLine("HostedServiceRunner: Stopping hosted services...");
 
         foreach (var service in hostedServices.AsEnumerable().Reverse())
         {
@@ -95,12 +96,12 @@ public static class HostedServiceRunner
             }
         }
 
-        Console.WriteLine("Disposing service provider...");
+        Console.WriteLine("HostedServiceRunner: Disposing service provider...");
 
         if (provider is IAsyncDisposable asyncDisposable)
             await asyncDisposable.DisposeAsync();
 
-        Console.WriteLine("Shutdown complete.");
+        Console.WriteLine("HostedServiceRunner: Shutdown complete.");
         Environment.Exit(0);
     }
 }
