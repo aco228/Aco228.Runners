@@ -49,6 +49,7 @@ public static class HostedServiceRunner
         //  Ctrl+C
         Console.CancelKeyPress += (_, e) =>
         {
+            Console.WriteLine("CTRL-C PRESSED");
             e.Cancel = true;
             RequestStop();
         };
@@ -56,6 +57,7 @@ public static class HostedServiceRunner
         // Docker / SIGTERM / service shutdown
         AppDomain.CurrentDomain.ProcessExit += (_, __) =>
         {
+            Console.WriteLine("Docker / SIGTERM / service shutdown");
             RequestStop();
         };
 
