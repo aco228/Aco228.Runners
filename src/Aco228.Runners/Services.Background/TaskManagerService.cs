@@ -23,8 +23,8 @@ public class TaskManagerService : HostServiceBase
     public static TaskManagerService? Instance { get; private set; }
 
     public DateTime? PauseUntil { get; set; } = null;
-    public bool IsRestartRequested { get; set; } = false;
     protected override TimeSpan DelayBetweenRetries => Delay;
+    public bool IsRestartAlreadyRequested => _shutdownRequestedDate != null;
 
     private DateTime? _shutdownRequestedDate = null;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
@@ -79,12 +79,11 @@ public class TaskManagerService : HostServiceBase
         await _taskRepo.InsertOrUpdateManyAsync(currentTasks);
     }
 
-    protected override async Task ExecuteTick()
+    private async Task HandleCurrentTasks()
     {
-        // remove completed tasks
-        foreach (var completedTask in CompletedTasks)
+        var completedSnapshot = CompletedTasks.ToList();
+        foreach (var completedTask in completedSnapshot)
         {
-            CompletedTasks.Remove(completedTask);
             var taskDefinition = Tasks.FirstOrDefault(x => x.Name.Equals(completedTask));
             RunningTasks.TryRemove(completedTask, out _);
             if (taskDefinition != null)
@@ -93,7 +92,16 @@ public class TaskManagerService : HostServiceBase
                 await taskDefinition.Document.InsertOrUpdateSingleAsync();
             }
         }
+        CompletedTasks.Clear();
         
+        TaskIgnores.ValidateIgnoreTasks();
+        foreach (var (_, taskCapsule) in RunningTasks)
+            await taskCapsule.Validate();
+    }
+
+    protected override async Task ExecuteTick()
+    {
+        await HandleCurrentTasks();
         if (_shutdownRequestedDate != null)
         {
             if ((DateTime.Now - _shutdownRequestedDate.Value).TotalMinutes < 25 && RunningTasks.Count > 0)
@@ -119,10 +127,6 @@ public class TaskManagerService : HostServiceBase
             
             PauseUntil = null;   
         }
-
-        TaskIgnores.ValidateIgnoreTasks();
-        foreach (var (_, taskCapsule) in RunningTasks)
-            await taskCapsule.Validate();
         
         if (RunningTasks.Count >= MAXIMUM_PER_TURN)
         {
@@ -183,7 +187,7 @@ public class TaskManagerService : HostServiceBase
     public void AddOrRemoveIgnoreTask(string taskName) 
         => TaskIgnores.AddOrRemoveTask(taskName);
 
-    public void DemandShutdown()
+    public void RequestShutdown()
     {
         if (TaskManagerConstants.CanPerformRestart == false)
             return;
