@@ -21,6 +21,8 @@ public class TaskManagerService : HostServiceBase
     private static bool IS_DEBUG = false;
     public static TimeSpan Delay = TimeSpan.FromSeconds(15);
     public static TaskManagerService? Instance { get; private set; }
+    public bool IsPaused => PauseUntil != null;
+    public bool IsOnShutdown => _shutdownRequestedDate != null;
 
     public DateTime? PauseUntil { get; set; } = null;
     protected override TimeSpan DelayBetweenRetries => Delay;
