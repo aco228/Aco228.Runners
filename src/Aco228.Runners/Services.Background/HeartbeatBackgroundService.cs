@@ -8,7 +8,7 @@ public class HeartbeatBackgroundService : HostServiceBase
     private IHostMachineService HostMachineService { get; set; }
     protected override TimeSpan DelayBetweenRetries => TimeSpan.FromMinutes(5);
     
-    public override async Task Initialize()
+    protected override async Task InitializeInternal()
     {
         Console.WriteLine("Initializing HeartbeatBackgroundService");
         HostMachineService = ServiceProviderHelper.GetService<IHostMachineService>()!;

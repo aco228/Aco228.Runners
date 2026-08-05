@@ -45,7 +45,7 @@ public class TaskManagerService : HostServiceBase
         Instance = this;
     }
     
-    public override async Task Initialize()
+    protected override async Task InitializeInternal()
     {
         #if DEBUG
         IS_DEBUG = true;
