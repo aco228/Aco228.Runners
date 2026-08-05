@@ -11,7 +11,7 @@ public interface IHostMachineService
     HostMachineContract GetMachineContract();
     string Name { get; }
     string ApplicationName { get; }
-    internal Task Initialize();
+    Task<IHostMachineService> Initialize();
     internal Task Tick();
 }
 
@@ -30,8 +30,11 @@ public class HostMachineService : IHostMachineService
         _machineContract = machineContract;
     }
     
-    public async Task Initialize()
+    public async Task<IHostMachineService> Initialize()
     {
+        if (_document != null)
+            return this;
+        
         HostMachineRepo = ServiceProviderHelper.GetService<IMongoRepo<HostMachineDocument>>()!;
         _document = await HostMachineRepo.FirstOrDefault(x => x.ApplicationName == ApplicationName && x.MachineName == Name);
         if (_document == null)
@@ -42,6 +45,8 @@ public class HostMachineService : IHostMachineService
                 MachineName = _machineContract.MachineName,
             };
         }
+
+        return this;
     }
 
     public async Task Tick()
