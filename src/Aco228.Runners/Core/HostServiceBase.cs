@@ -19,8 +19,16 @@ public abstract class HostServiceBase : BackgroundService
         
         for(;;)
         {
-            await ExecuteTick();
-            await Task.Delay(DelayBetweenRetries, stoppingToken);
+            try
+            {
+                await ExecuteTick();
+                await Task.Delay(DelayBetweenRetries, stoppingToken);
+            }
+            catch
+            {
+                var nextDelay = DelayBetweenRetries * 2;
+                await Task.Delay(nextDelay, stoppingToken);
+            }
         }
     }
 
