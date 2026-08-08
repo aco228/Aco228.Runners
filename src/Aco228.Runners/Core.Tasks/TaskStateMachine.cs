@@ -11,10 +11,17 @@ public class TaskStateMachine
     private bool _running = false;
     private readonly object _lock = new();
     private Task? _loopTask;
+    private int _activeCount = 0; // dequeued but not-yet-completed items (waiting on semaphore or executing)
 
     public Action<Exception, object?>? OnError { get; set; }
 
     private SemaphoreSlim Semaphore => _semaphore ??= new SemaphoreSlim(_limit);
+
+    /// <summary>
+    /// Number of tasks currently executing plus tasks still waiting to run (queued or
+    /// dequeued-but-not-yet-started). Safe to read from any thread.
+    /// </summary>
+    public int Count => _queue.Count + Volatile.Read(ref _activeCount);
 
     public TaskStateMachine SetLimit(int limit)
     {
@@ -36,7 +43,7 @@ public class TaskStateMachine
         _queue.Enqueue((func, entry));
         TryStart();
     }
-    
+
     private void TryStart()
     {
         lock (_lock)
@@ -55,6 +62,7 @@ public class TaskStateMachine
             {
                 if (_queue.TryDequeue(out var item))
                 {
+                    Interlocked.Increment(ref _activeCount);
                     await Semaphore.WaitAsync();
                     var t = Task.Run(async () =>
                     {
@@ -65,7 +73,11 @@ public class TaskStateMachine
                             if (item.entry != null)
                                 _queue.Enqueue(item);
                         }
-                        finally { Semaphore.Release(); }
+                        finally
+                        {
+                            Semaphore.Release();
+                            Interlocked.Decrement(ref _activeCount);
+                        }
                     });
                     _tasks.Add(t);
                 }
@@ -83,6 +95,7 @@ public class TaskStateMachine
             if (!_queue.IsEmpty) TryStart();
         }
     }
+
     public async Task Wait()
     {
         if (_loopTask != null)
