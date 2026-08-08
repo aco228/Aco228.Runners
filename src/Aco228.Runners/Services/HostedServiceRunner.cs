@@ -50,8 +50,7 @@ public static class HostedServiceRunner
         Console.CancelKeyPress += (_, e) =>
         {
             Console.WriteLine("HostedServiceRunner: CTRL-C PRESSED");
-            e.Cancel = true;
-            RequestStop();
+            Environment.Exit(0);
         };
 
         // Docker / SIGTERM / service shutdown
