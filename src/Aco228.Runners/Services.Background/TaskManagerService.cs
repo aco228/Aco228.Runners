@@ -17,7 +17,6 @@ namespace Aco228.Runners.Services.Background;
 
 public class TaskManagerService : HostServiceBase
 {
-    private static int MAXIMUM_PER_TURN = 11;
     private static bool IS_DEBUG = false;
     public static TimeSpan Delay = TimeSpan.FromSeconds(15);
     public static TaskManagerService? Instance { get; private set; }
@@ -27,6 +26,7 @@ public class TaskManagerService : HostServiceBase
     public DateTime? PauseUntil { get; set; } = null;
     protected override TimeSpan DelayBetweenRetries => Delay;
     public bool IsRestartAlreadyRequested => _shutdownRequestedDate != null;
+    public int MaximumPerTurn { get; set; } = 12;
 
     private DateTime? _shutdownRequestedDate = null;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
@@ -49,8 +49,11 @@ public class TaskManagerService : HostServiceBase
     {
         #if DEBUG
         IS_DEBUG = true;
-        MAXIMUM_PER_TURN = 1;
         #endif
+        
+        var envMaxPerTurn = Environment.GetEnvironmentVariable("MAX_PER_TURN") ?? "12";
+        if(int.TryParse(envMaxPerTurn, out int maxPerTurn))
+            MaximumPerTurn = maxPerTurn;
 
         if (string.IsNullOrEmpty(_hostMachineService.Name))
             throw new InvalidOperationException($"Unknown machine name on TaskManagerInitialize");
@@ -130,7 +133,7 @@ public class TaskManagerService : HostServiceBase
             PauseUntil = null;   
         }
         
-        if (RunningTasks.Count >= MAXIMUM_PER_TURN)
+        if (RunningTasks.Count >= MaximumPerTurn)
         {
             Console.WriteLine("Tick (max)"); 
             return;   
@@ -168,7 +171,7 @@ public class TaskManagerService : HostServiceBase
         candidates = candidates.OrderByDescending(x => x.PriorityIndex).ThenBy(x => x.Document.LastExecutionUtc).ToList();
         foreach (var candidate in candidates)
         {
-            if (RunningTasks.Count >= MAXIMUM_PER_TURN)
+            if (RunningTasks.Count >= MaximumPerTurn)
             {
                 Console.WriteLine("Tick (can_max)");
                 return;
@@ -183,7 +186,7 @@ public class TaskManagerService : HostServiceBase
             }
         }
         
-        Console.WriteLine($"Tick (exe) (running: {RunningTasks.Count}/{MAXIMUM_PER_TURN}, ct: {CompletedTasks.Count})");
+        Console.WriteLine($"Tick (exe) (running: {RunningTasks.Count}/{MaximumPerTurn}, ct: {CompletedTasks.Count})");
     }
 
     public void AddOrRemoveIgnoreTask(string taskName) 
