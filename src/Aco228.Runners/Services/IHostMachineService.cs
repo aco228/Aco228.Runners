@@ -45,6 +45,9 @@ public class HostMachineService : IHostMachineService
                 MachineName = _machineContract.MachineName,
             };
         }
+        
+        _document.StartTimeUtc =  DateTime.UtcNow;
+        await HostMachineRepo.InsertOrUpdateAsync(_document);
 
         return this;
     }

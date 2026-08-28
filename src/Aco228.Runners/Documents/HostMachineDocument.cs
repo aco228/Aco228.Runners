@@ -12,4 +12,5 @@ public class HostMachineDocument : MongoDocument
     public required string ApplicationName { get; set; }
     
     public DateTime? LastTickUtc { get; set; }
+    public DateTime? StartTimeUtc { get; set; }
 }
