@@ -26,7 +26,7 @@ public class TaskManagerService : HostServiceBase
     public DateTime? PauseUntil { get; set; } = null;
     protected override TimeSpan DelayBetweenRetries => Delay;
     public bool IsRestartAlreadyRequested => _shutdownRequestedDate != null;
-    public int MaximumPerTurn { get; set; } = 12;
+    public int MaximumPerTurn { get; set; } = 14;
 
     private DateTime? _shutdownRequestedDate = null;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
@@ -51,7 +51,7 @@ public class TaskManagerService : HostServiceBase
         IS_DEBUG = true;
         #endif
         
-        var envMaxPerTurn = Environment.GetEnvironmentVariable("MAX_PER_TURN") ?? "12";
+        var envMaxPerTurn = Environment.GetEnvironmentVariable("MAX_PER_TURN") ?? "14";
         if(int.TryParse(envMaxPerTurn, out int maxPerTurn))
             MaximumPerTurn = maxPerTurn;
 
