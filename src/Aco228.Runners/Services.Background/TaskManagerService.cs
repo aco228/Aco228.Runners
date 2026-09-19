@@ -249,6 +249,7 @@ public class TaskManagerService : HostServiceBase
         
         Console.WriteLine($" ||| RequestTaskExecution. Scheduled: {taskName}");
         task.Document.LastExecutionUtc = DateTime.MinValue;
+        task.Document.LastSuccessExecutionInUtc = DateTime.MinValue;
         task.ImmediateExecutionRequested = true;
     }
 
