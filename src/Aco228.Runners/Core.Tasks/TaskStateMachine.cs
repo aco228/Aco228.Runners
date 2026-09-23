@@ -108,4 +108,30 @@ public class TaskStateMachine
         // Reset so the machine can be reused
         Semaphore.Release(_limit);
     }
+
+    /// <summary>
+    /// Blocking counterpart of <see cref="Wait"/>. Returns once every scheduled task has
+    /// completed. Does not block on the loop task itself, so it is safe to call from a thread
+    /// that carries a synchronization context.
+    /// </summary>
+    public void WaitSync()
+    {
+        // Wait until the loop has drained the queue and stopped. The loop only exits with an
+        // empty queue once no task is in flight, so there is nothing left to re-enqueue.
+        while (true)
+        {
+            lock (_lock)
+            {
+                if (!_running && _queue.IsEmpty) break;
+            }
+            Thread.Sleep(50);
+        }
+
+        // Drain all semaphore slots - proves every Task.Run has hit Semaphore.Release()
+        for (int i = 0; i < _limit; i++)
+            Semaphore.Wait();
+
+        // Reset so the machine can be reused
+        Semaphore.Release(_limit);
+    }
 }
