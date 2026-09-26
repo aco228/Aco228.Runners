@@ -53,19 +53,21 @@ public static class HourWindowExtensions
         return afterFrom && beforeTo;
     }
 
-    public static bool IsDelayOkay(this DelayWindow window, DateTime compareTimeUtc)
+    public static bool IsDelayOkay(this DelayWindow window, DateTime? compareTimeUtc)
     {
+        if (compareTimeUtc == null) return true;
+        
         var currentUtcTime = DateTime.UtcNow;
         var difference = 0.0;
             
         if (window.Type == DelayType.Days)
-            difference = (currentUtcTime - compareTimeUtc).TotalDays;
+            difference = (currentUtcTime - compareTimeUtc.Value).TotalDays;
         if (window.Type == DelayType.Hours)
-            difference = (currentUtcTime - compareTimeUtc).TotalHours;
+            difference = (currentUtcTime - compareTimeUtc.Value).TotalHours;
         if (window.Type == DelayType.Minutes)
-            difference = (currentUtcTime - compareTimeUtc).TotalMinutes;
+            difference = (currentUtcTime - compareTimeUtc.Value).TotalMinutes;
         if (window.Type == DelayType.Seconds)
-            difference = (currentUtcTime - compareTimeUtc).TotalSeconds;
+            difference = (currentUtcTime - compareTimeUtc.Value).TotalSeconds;
             
         if (difference < window.Value)
             return false;
