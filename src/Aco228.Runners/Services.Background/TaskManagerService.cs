@@ -20,6 +20,7 @@ public class TaskManagerService : HostServiceBase
     private static bool IS_DEBUG = false;
     public static TimeSpan Delay = TimeSpan.FromSeconds(15);
     public static TaskManagerService? Instance { get; private set; }
+    public static event Action? OnStateChanged;
     public bool IsPaused => PauseUntil != null;
     public bool IsOnShutdown => _shutdownRequestedDate != null;
 
@@ -199,6 +200,19 @@ public class TaskManagerService : HostServiceBase
         
         Console.WriteLine("[[- TASK MANAGER RECEIVED RESTART");
         _shutdownRequestedDate = DateTime.Now;
+        OnStateChanged?.Invoke();
+    }
+
+    public void RequestPause()
+    {
+        PauseUntil = DateTime.Now.AddHours(4);
+        OnStateChanged?.Invoke();
+    }
+
+    public void RequestContinue()
+    {
+        PauseUntil = null;
+        OnStateChanged?.Invoke();
     }
     
     internal void OnTaskFinished(TaskCapsule task)
