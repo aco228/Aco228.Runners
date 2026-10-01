@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Aco228.Common;
 using Aco228.Common.Extensions;
+using Aco228.Common.Helpers;
 using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions;
 using Aco228.MongoDb.Extensions.MongoDocuments;
@@ -30,6 +31,7 @@ public class TaskManagerService : HostServiceBase
     public int MaximumPerTurn { get; set; } = 14;
 
     private DateTime? _shutdownRequestedDate = null;
+    private bool _rebuildOnShutdown = false;
     private readonly IMongoRepo<TaskDocument> _taskRepo;
     private readonly IHostMachineService _hostMachineService;
     private List<TaskDefinition> Tasks { get; set; } = new();
@@ -108,6 +110,15 @@ public class TaskManagerService : HostServiceBase
     protected override async Task ExecuteTick()
     {
         await HandleCurrentTasks();
+        if (_shutdownRequestedDate != null && _rebuildOnShutdown && SelfUpdateService.State == SelfUpdateState.Failed)
+        {
+            // Failed build costs nothing: leave shutdown mode and keep running the current version
+            Console.WriteLine("--- Rebuild failed, shutdown cancelled");
+            _shutdownRequestedDate = null;
+            _rebuildOnShutdown = false;
+            OnStateChanged?.Invoke();
+        }
+
         if (_shutdownRequestedDate != null)
         {
             if ((DateTime.Now - _shutdownRequestedDate.Value).TotalMinutes < 25 && RunningTasks.Count > 0)
@@ -115,7 +126,13 @@ public class TaskManagerService : HostServiceBase
                 Console.WriteLine("--- Under shutdown mode. Waiting: " + string.Join(", ", RunningTasks.Keys));
                 return;
             }
-         
+
+            if (_rebuildOnShutdown && SelfUpdateService.IsBuilding)
+            {
+                Console.WriteLine("--- Under shutdown mode. Waiting for rebuild");
+                return;
+            }
+
             Console.WriteLine("--- Shutdown");
             Environment.Exit(0);
             return;
@@ -193,13 +210,27 @@ public class TaskManagerService : HostServiceBase
     public void AddOrRemoveIgnoreTask(string taskName) 
         => TaskIgnores.AddOrRemoveTask(taskName);
 
-    public void RequestShutdown()
+    /// <param name="rebuild">
+    /// Also build the new version (SelfUpdateService) while running tasks finish.
+    /// The app exits only after the build succeeded; a failed build cancels the shutdown.
+    /// </param>
+    public void RequestShutdown(bool rebuild = false)
     {
         if (TaskManagerConstants.CanPerformRestart == false)
             return;
-        
-        Console.WriteLine("[[- TASK MANAGER RECEIVED RESTART");
+
+        if (_shutdownRequestedDate != null)
+        {
+            Console.WriteLine("[[- TASK MANAGER RECEIVED RESTART (already in shutdown mode -- ignored)");
+            return;
+        }
+
+        Console.WriteLine($"[[- TASK MANAGER RECEIVED RESTART (rebuild: {rebuild})");
+        _rebuildOnShutdown = rebuild;
         _shutdownRequestedDate = DateTime.Now;
+        if (rebuild)
+            SelfUpdateService.StartRebuild();
+
         OnStateChanged?.Invoke();
     }
 
