@@ -3,6 +3,7 @@ using Aco228.Common.Models;
 using Aco228.MongoDb.Extensions.RepoExtensions;
 using Aco228.MongoDb.Services;
 using Aco228.Runners.Documents;
+using MongoDB.Driver;
 
 namespace Aco228.Runners.Services;
 
@@ -54,7 +55,10 @@ public class HostMachineService : IHostMachineService
 
     public async Task Tick()
     {
+        // only the tick time: a full replace would overwrite flags changed from the UI
         _document!.LastTickUtc = DateTime.UtcNow;
-        await HostMachineRepo.InsertOrUpdateAsync(_document);
+        await HostMachineRepo.GetCollection().UpdateOneAsync(
+            Builders<HostMachineDocument>.Filter.Eq(x => x.Id, _document.Id),
+            Builders<HostMachineDocument>.Update.Set(x => x.LastTickUtc, _document.LastTickUtc));
     }
 }

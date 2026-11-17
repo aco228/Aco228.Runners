@@ -13,4 +13,7 @@ public class HostMachineDocument : MongoDocument
     
     public DateTime? LastTickUtc { get; set; }
     public DateTime? StartTimeUtc { get; set; }
+
+    // set from the UI, read by the facebook scrape task on every run
+    public bool IsFacebookScrapeEnabled { get; set; }
 }
