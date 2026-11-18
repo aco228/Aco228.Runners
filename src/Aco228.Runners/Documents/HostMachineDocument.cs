@@ -16,4 +16,7 @@ public class HostMachineDocument : MongoDocument
 
     // set from the UI, read by the facebook scrape task on every run
     public bool IsFacebookScrapeEnabled { get; set; }
+
+    // set from the UI, read by the adplexity scrape task on every run
+    public bool IsAdplexityScrapeEnabled { get; set; }
 }
